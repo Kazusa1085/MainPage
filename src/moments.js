@@ -210,7 +210,7 @@ class MomentsFeed {
         pageCount++;
         var params = [];
         params.push('filter=' + encodeURIComponent(filter));
-        params.push('orderBy=' + encodeURIComponent('pinned desc, display_time desc'));
+        params.push('orderBy=' + encodeURIComponent('pinned desc, create_time desc'));
         params.push('pageSize=100');
 
         if (nextPageToken) {
@@ -285,7 +285,7 @@ class MomentsFeed {
     // 注意：URLSearchParams 会将空格编码为 +，但某些API期望 %20
     var params = [];
     params.push('filter=' + encodeURIComponent(filter));
-    params.push('orderBy=' + encodeURIComponent('pinned desc, display_time desc'));
+    params.push('orderBy=' + encodeURIComponent('pinned desc, create_time desc'));
     params.push('pageSize=' + (this.config.count || 10));
 
     if (pageToken) {
@@ -968,7 +968,7 @@ class MomentsFeed {
         console.log('[Moments] 发现置顶动态:', {
           id: m.name,
           pinned: m.pinned,
-          displayTime: m.displayTime
+          createTime: m.createTime
         });
       }
 
@@ -1048,8 +1048,8 @@ class MomentsFeed {
 
     const time = document.createElement('time');
     time.className = 'moment-date';
-    time.setAttribute('datetime', m.displayTime);
-    time.textContent = self.formatDate(m.displayTime);
+    time.setAttribute('datetime', m.createTime);
+    time.textContent = self.formatDate(m.createTime);
     meta.appendChild(time);
 
     if (m.tags && m.tags.length > 0) {
