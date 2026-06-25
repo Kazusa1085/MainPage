@@ -119,12 +119,12 @@ window.HOMEPAGE_CONFIG = {
       prefix: "🐾",
       highlight: "欢迎来到我的主页！",
     },
-    avatar: "https://avatars.githubusercontent.com/u/195487617?v=4",
+    avatar: "images/avatars.jpg",
   },
 
   // ========== Favicon 配置 ==========
   favicon: {
-    path: "https://blog.raana.icu/favicon/icon.png", // 自定义 favicon 路径（如 "images/favicon.ico"），留空则从头像自动生成
+    path: "images/icon.png", // 自定义 favicon 路径（如 "images/favicon.ico"），留空则从头像自动生成
   },
 
   // ========== 身份标签 ==========
