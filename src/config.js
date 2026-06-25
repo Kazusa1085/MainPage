@@ -8,30 +8,26 @@ window.HOMEPAGE_CONFIG = {
   // 这些是网站的核心信息，会被所有页面引用
   site: {
     name: "Kazusa1085", // 站点名称（用于标题后缀）
-    tagline: "技术博主 / 开源爱好者 / AI 探索者", // 站点标语（用于首页标题）
+    tagline: "寄术博主 / 炸板小能手 / 摸鱼怪", // 站点标语（用于首页标题）
     url: "", // 站点完整 URL（用于 OG 图片等绝对路径）- 空值使用相对路径
-    ogImage: "/images/avatar.webp", // 默认 OG 图片（所有页面共用）
+    ogImage: "https://avatars.githubusercontent.com/u/195487617?v=4", // 默认 OG 图片（所有页面共用）
   },
 
   // ========== SEO 配置（首页专用） ==========
   // 首页使用完整的自定义 SEO 内容
   // 内页会自动生成标准格式的标题和描述
   seo: {
-    title: "Kazusa1085 - 技术博主 / 开源爱好者 / AI 探索者",
-    description: "Hi，欢迎访问我的个人主页。这里是技术分享与生活记录的空间。",
+    title: "Kazusa1085 - 寄术博主 / 炸板小能手 / 摸鱼怪",
+    description: "Hi，欢迎访问我的个人主页。",
     keywords: [
       "Kazusa1085",
       "技术博客",
       "Astro",
-      "Docker",
-      "NAS",
-      "私有云",
-      "AI工具",
       "自动化部署",
     ],
     og: {
       title: "Kazusa1085 - 个人主页",
-      description: "开源爱好者 / AI探索者 - 与我一起探索技术边界",
+      description: "寄术博主 / 炸板小能手 / 摸鱼怪 - 什么都做，什么都写。",
       image: "https://avatars.githubusercontent.com/u/195487617?v=4",
     },
   },
@@ -79,8 +75,8 @@ window.HOMEPAGE_CONFIG = {
     // 默认配色方案（页面打开时的初始配色，用户仍可自由切换）
     // 可选值: null(使用内置默认) | 'coralOrange' | 'nordSnowStorm' | 'gruvboxLight' | 'ayuLight' | 'cyberGreen' | 'catppuccinMocha' | 'kanagawaDragon' | 'rosePineMoon'
     defaultScheme: {
-      light: null, // 亮色模式: null(使用内置默认) | coralOrange | nordSnowStorm | gruvboxLight | ayuLight
-      dark: null, // 暗色模式: null(使用内置默认) | cyberGreen | catppuccinMocha | kanagawaDragon | rosePineMoon
+      light: nordSnowStorm, // 亮色模式: null(使用内置默认) | coralOrange | nordSnowStorm | gruvboxLight | ayuLight
+      dark: catppuccinMocha, // 暗色模式: null(使用内置默认) | cyberGreen | catppuccinMocha | kanagawaDragon | rosePineMoon
     },
   },
 
@@ -123,12 +119,12 @@ window.HOMEPAGE_CONFIG = {
       prefix: "🐾",
       highlight: "欢迎来到我的主页！",
     },
-    avatar: "images/avatar.webp",
+    avatar: "https://avatars.githubusercontent.com/u/195487617?v=4",
   },
 
   // ========== Favicon 配置 ==========
   favicon: {
-    path: "", // 自定义 favicon 路径（如 "images/favicon.ico"），留空则从头像自动生成
+    path: "https://blog.raana.icu/favicon/icon.png", // 自定义 favicon 路径（如 "images/favicon.ico"），留空则从头像自动生成
   },
 
   // ========== 身份标签 ==========
@@ -229,8 +225,8 @@ window.HOMEPAGE_CONFIG = {
 
   // ========== RSS 文章配置 ==========
   rss: {
-    enabled: false, // 设置为 true 启用
-    url: "https://yourblog.com/rss.xml", // 你的博客 RSS 地址
+    enabled: true, // 设置为 true 启用
+    url: "https://blog.raana.icu/rss.xml", // 你的博客 RSS 地址
     count: 4,
     openInNewTab: true,
     title: {
@@ -262,7 +258,7 @@ window.HOMEPAGE_CONFIG = {
 
   // ========== GitHub 贡献图配置 ==========
   contribution: {
-    enabled: true, // 是否启用贡献图
+    enabled: false, // 是否启用贡献图
     useRealData: true, // true=真实数据, false=随机数据
     // GitHub 用户名（留空则从 projects.githubUser 自动提取）
     githubUser: "",
@@ -330,7 +326,7 @@ window.HOMEPAGE_CONFIG = {
     {
       name: "Blog",
       description: "技术文章 & 教程",
-      url: "https://yourblog.com",
+      url: "https://blog.raana.icu",
       icon: "fa-solid fa-pen-nib",
       brand: "blog",
       external: true,
@@ -340,7 +336,7 @@ window.HOMEPAGE_CONFIG = {
     {
       name: "GitHub",
       description: "开源项目 & 代码",
-      url: "https://github.com/yourid",
+      url: "https://github.com/Kazusa1085",
       icon: "fa-brands fa-github",
       brand: "github",
       external: true,
@@ -407,7 +403,7 @@ window.HOMEPAGE_CONFIG = {
     copyright: {
       year: "2018-2026", // 版权年份
       name: "Your Name", // 版权名称
-      url: "https://yourblog.com/", // 链接地址
+      url: "https://blog.raana.icu/", // 链接地址
     },
     // ICP 备案号配置（中国大陆网站需要）
     icp: {
@@ -444,7 +440,7 @@ window.HOMEPAGE_CONFIG = {
     umami: "",
     // 自定义脚本 - 支持任意第三方统计代码
     // 留空数组则不启用
-    customScripts: [],
+    customScripts: [<script defer src="https://umami.raana.icu/script.js" data-website-id="653e2a81-2890-4a85-845f-325f0f5a46b1"></script>],
   },
 };
 
