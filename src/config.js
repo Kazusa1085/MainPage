@@ -7,7 +7,7 @@ window.HOMEPAGE_CONFIG = {
   // ========== 站点基础配置 ==========
   // 这些是网站的核心信息，会被所有页面引用
   site: {
-    name: "YourName", // 站点名称（用于标题后缀）
+    name: "Kazusa1085", // 站点名称（用于标题后缀）
     tagline: "技术博主 / 开源爱好者 / AI 探索者", // 站点标语（用于首页标题）
     url: "", // 站点完整 URL（用于 OG 图片等绝对路径）- 空值使用相对路径
     ogImage: "/images/avatar.webp", // 默认 OG 图片（所有页面共用）
@@ -17,10 +17,10 @@ window.HOMEPAGE_CONFIG = {
   // 首页使用完整的自定义 SEO 内容
   // 内页会自动生成标准格式的标题和描述
   seo: {
-    title: "YourName - 技术博主 / 开源爱好者 / AI 探索者",
+    title: "Kazusa1085 - 技术博主 / 开源爱好者 / AI 探索者",
     description: "Hi，欢迎访问我的个人主页。这里是技术分享与生活记录的空间。",
     keywords: [
-      "YourName",
+      "Kazusa1085",
       "技术博客",
       "Astro",
       "Docker",
@@ -30,9 +30,9 @@ window.HOMEPAGE_CONFIG = {
       "自动化部署",
     ],
     og: {
-      title: "YourName - 个人主页",
+      title: "Kazusa1085 - 个人主页",
       description: "开源爱好者 / AI探索者 - 与我一起探索技术边界",
-      image: "https://example.com/images/avatar.webp",
+      image: "https://avatars.githubusercontent.com/u/195487617?v=4",
     },
   },
 
@@ -74,7 +74,7 @@ window.HOMEPAGE_CONFIG = {
   theme: {
     // 默认主题模式
     // 可选值: 'light' | 'dark' | 'auto'
-    default: "auto",
+    default: "dark",
 
     // 默认配色方案（页面打开时的初始配色，用户仍可自由切换）
     // 可选值: null(使用内置默认) | 'coralOrange' | 'nordSnowStorm' | 'gruvboxLight' | 'ayuLight' | 'cyberGreen' | 'catppuccinMocha' | 'kanagawaDragon' | 'rosePineMoon'
@@ -118,7 +118,7 @@ window.HOMEPAGE_CONFIG = {
 
   // ========== 个人信息 ==========
   profile: {
-    name: "YourName",
+    name: "Kazusa1085",
     tagline: {
       prefix: "🐾",
       highlight: "欢迎来到我的主页！",
@@ -132,7 +132,7 @@ window.HOMEPAGE_CONFIG = {
   },
 
   // ========== 身份标签 ==========
-  identity: ["Hi, I'm YourName.", "开源爱好者", "AI探索者", "自动化实践者"],
+  identity: ["Hi, I'm Kazusa1085.", "开源爱好者", "AI探索者", "自动化实践者"],
 
   // ========== 兴趣领域 ==========
   interests: ["Docker & 容器技术", "NAS & 私有云", "AI工具", "自动化部署"],
@@ -338,16 +338,6 @@ window.HOMEPAGE_CONFIG = {
       enabled: true,
     },
     {
-      name: "Photos",
-      description: "摄影作品",
-      url: "#",
-      icon: "fa-solid fa-images",
-      brand: "photos",
-      external: true,
-      color: "#FF9500",
-      enabled: true,
-    },
-    {
       name: "GitHub",
       description: "开源项目 & 代码",
       url: "https://github.com/yourid",
@@ -355,56 +345,6 @@ window.HOMEPAGE_CONFIG = {
       brand: "github",
       external: true,
       color: "#58a6ff",
-      enabled: true,
-    },
-    {
-      name: "X",
-      description: "X (Twitter)",
-      url: "https://x.com/yourid",
-      icon: "fa-brands fa-x-twitter",
-      brand: "x",
-      external: true,
-      color: "#C0C0C0",
-      enabled: true,
-    },
-    {
-      name: "Telegram",
-      description: "即时通讯",
-      url: "https://t.me/yourid",
-      icon: "fa-brands fa-telegram",
-      brand: "telegram",
-      external: true,
-      color: "#229ED9",
-      enabled: true,
-    },
-    {
-      name: "Discord",
-      description: "社区交流",
-      url: "https://discord.gg/yourid",
-      icon: "fa-brands fa-discord",
-      brand: "discord",
-      external: true,
-      color: "#5865F2",
-      enabled: true,
-    },
-    {
-      name: "Bilibili",
-      description: "视频教程",
-      url: "https://space.bilibili.com/yourid",
-      icon: "fa-brands fa-bilibili",
-      brand: "bilibili",
-      external: true,
-      color: "#00A1D6",
-      enabled: true,
-    },
-    {
-      name: "Weibo",
-      description: "微博",
-      url: "https://weibo.com/yourid",
-      icon: "fa-brands fa-weibo",
-      brand: "weibo",
-      external: true,
-      color: "#E6162D",
       enabled: true,
     },
     {
@@ -448,14 +388,14 @@ window.HOMEPAGE_CONFIG = {
         name: "爱发电",
         key: "afdian",
         icon: "fa-solid fa-heart",
-        url: "https://ifdian.net/a/yourname",
+        url: "https://ifdian.net/a/Kazusa1085",
         enabled: true,
       },
       {
         name: "PayPal",
         key: "paypal",
         icon: "fa-brands fa-paypal",
-        url: "https://www.paypal.com/paypalme/yourname",
+        url: "https://www.paypal.com/paypalme/Kazusa1085",
         enabled: false,
       },
     ],
