@@ -2274,7 +2274,7 @@ function extractSiteConfig() {
             name: 'MoeWah',
             tagline: '技术博主 / 开源爱好者 / AI 探索者',
             url: '',
-            ogImage: '/images/avatar.webp',
+            ogImage: '/images/avatar.jpg',
         };
     }
     const content = siteMatch[1];
@@ -2284,7 +2284,7 @@ function extractSiteConfig() {
         tagline: extractStringValue(content, 'tagline') || '技术博主 / 开源爱好者 / AI 探索者',
         // 空字符串表示使用相对路径，undefined/null 才使用默认值
         url: urlValue !== undefined && urlValue !== null ? urlValue : '',
-        ogImage: extractStringValue(content, 'ogImage') || '/images/avatar.webp',
+        ogImage: extractStringValue(content, 'ogImage') || '/images/avatar.jpg',
     };
 }
 
@@ -2436,14 +2436,14 @@ const config = {
     keywords: extractArray(/keywords:\s*\[([\s\S]*?)\]/, ['MoeWah', '技术博客', 'Astro', 'Docker']),
     ogTitle: extractNestedString(/og:\s*\{([\s\S]*?)\}/, 'title', 'MoeWah - 个人主页'),
     ogDescription: extractNestedString(/og:\s*\{([\s\S]*?)\}/, 'description', '开源爱好者 / Astro爱好者 / AI探索者'),
-    ogImage: extractNestedString(/og:\s*\{([\s\S]*?)\}/, 'image', 'https://www.moewah.com/images/avatar.webp'),
+    ogImage: extractNestedString(/og:\s*\{([\s\S]*?)\}/, 'image', 'https://www.moewah.com/images/avatar.jpg'),
 
     // Pages - 独立页面配置
     pages: extractPagesConfig(),
 
     // Profile
     name: extractNestedString(/profile:\s*\{([\s\S]*?)\}/, 'name', 'MoeWah'),
-    avatar: extractNestedString(/profile:\s*\{([\s\S]*?)\}/, 'avatar', 'images/avatar.webp'),
+    avatar: extractNestedString(/profile:\s*\{([\s\S]*?)\}/, 'avatar', 'images/avatar.jpg'),
     taglinePrefix: extractNestedString(/tagline:\s*\{([\s\S]*?)\}/, 'prefix', '🐾'),
     taglineHighlight: extractNestedString(/tagline:\s*\{([\s\S]*?)\}/, 'highlight', '万物皆可萌！'),
 
@@ -2624,7 +2624,7 @@ function generateSEOMetaHTML(seo, pageUrl = '') {
 
 /**
  * URL 辅助函数 - 根据 siteUrl 配置生成资源路径
- * @param {string} path - 相对路径（如 "style.css", "images/avatar.webp"）
+ * @param {string} path - 相对路径（如 "style.css", "images/avatar.jpg"）
  * @returns {string} - 完整 URL 或相对路径
  */
 function url(path) {
@@ -2872,12 +2872,12 @@ async function build() {
     // 优先使用自定义 favicon（path 有值且文件存在）
     if (config.favicon.path) {
         const customFaviconSrc = path.join(rootDir, 'src', config.favicon.path);
-        const customFaviconDest = path.join(distDir, 'images/favicon.ico');
+        const customFaviconDest = path.join(distDir, 'images/icon.png');
 
         if (fs.existsSync(customFaviconSrc)) {
             fs.copyFileSync(customFaviconSrc, customFaviconDest);
             console.log('   ✓ 使用自定义 favicon: ' + config.favicon.path);
-            faviconPath = 'images/favicon.ico';
+            faviconPath = 'images/icon.png';
         } else {
             console.log('   ⚠️ 自定义 favicon 文件不存在: src/' + config.favicon.path);
         }
@@ -2886,7 +2886,7 @@ async function build() {
     // 没有自定义 favicon 时，从头像自动生成（默认行为）
     if (!faviconPath) {
         const avatarSrc = path.join(rootDir, 'src', config.avatar);
-        const faviconDest = path.join(distDir, 'images/favicon.ico');
+        const faviconDest = path.join(distDir, 'images/icon.png');
 
         if (fs.existsSync(avatarSrc)) {
             const avatarBuffer = fs.readFileSync(avatarSrc);
@@ -2894,7 +2894,7 @@ async function build() {
 
             if (result.success) {
                 console.log('   ✓ 从头像生成 favicon (尺寸: ' + result.sizes.join(', ') + ')');
-                faviconPath = 'images/favicon.ico';
+                faviconPath = 'images/icon.png';
                 appleTouchPath = 'images/favicon-apple-touch.png';
             } else {
                 console.log('   ⚠️ favicon 生成失败');
@@ -3216,7 +3216,7 @@ async function build() {
         await processFile('src/guestbook.js', 'guestbook.js');
     }
 
-    await processFile('src/images/avatar.webp', 'images/avatar.webp');
+    await processFile('src/images/avatar.jpg', 'images/avatar.jpg');
 
     // 处理捐赠二维码图片
     if (config.donation.enabled && config.donation.methods) {
