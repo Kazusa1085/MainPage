@@ -1,0 +1,134 @@
+---
+import { rss } from '../data/config.js';
+import { fetchArticles } from '../data/fetch-rss.js';
+
+const articles = rss.enabled ? await fetchArticles(rss.url, rss.count) : [];
+const maxLen = rss.display?.maxDescriptionLength || 100;
+
+function truncate(text) {
+  if (!text) return '';
+  return text.length > maxLen ? text.slice(0, maxLen) + '...' : text;
+}
+
+// 主卡片区：前3篇文章（支持翻转）；额外卡片区：第4篇及以后，每两篇一组
+const primaryArticles = articles.slice(0, 3);
+const extraArticles = articles.slice(3);
+
+const cardContainers = [];
+for (let i = 0; i < 3; i++) {
+  if (primaryArticles[i]) {
+    cardContainers.push({ index: i, front: primaryArticles[i], back: extraArticles[i] || null });
+  }
+}
+const remaining = extraArticles.slice(3);
+for (let i = 0; i < remaining.length; i += 2) {
+  if (remaining[i]) {
+    cardContainers.push({ index: 4 + Math.floor(i / 2), front: remaining[i], back: remaining[i + 1] || null });
+  }
+}
+
+const hasExtraCards = extraArticles.length > 0;
+const countText = `${articles.length} posts`;
+const openInNewTab = !!rss.openInNewTab;
+---
+{rss.enabled && (
+  <>
+    <div class="divider divider-compact lazy-load" data-delay="4"></div>
+    <div class="rss-section lazy-load" id="rss-section" data-delay="4">
+      <div class="rss-header">
+        <i class={rss.title?.icon || 'fa-solid fa-newspaper'}></i>
+        <span class="rss-title">{rss.title?.text || '近期更新'}</span>
+        <span class="section-count">{countText}</span>
+      </div>
+
+      {articles.length === 0 ? (
+        <div class="rss-articles rss-empty">
+          <span class="rss-empty-text">暂无最新文章</span>
+        </div>
+      ) : (
+        <div class:list={['rss-articles', { 'has-extra-cards': hasExtraCards }]}>
+          {cardContainers.map(({ index, front, back }) => (
+            <div class="rss-card-container" data-card-index={index}>
+              {[{ article: front, isBack: false }, ...(back ? [{ article: back, isBack: true }] : [])].map(({ article, isBack }) => (
+                <a
+                  href={article.link}
+                  class:list={['rss-article', { 'rss-article-back': isBack }]}
+                  target={openInNewTab ? '_blank' : undefined}
+                  rel={openInNewTab ? 'noopener noreferrer' : undefined}
+                  aria-label={`阅读文章：${article.title}`}
+                >
+                  <div class="rss-article-content">
+                    <span class="rss-article-title">{article.title}</span>
+                    {rss.display?.showDescription && article.description && (
+                      <p class="rss-article-desc">{truncate(article.description)}</p>
+                    )}
+                  </div>
+                  <div class="rss-article-meta">
+                    {rss.display?.showDate && article.date && <span class="rss-article-date">{article.date}</span>}
+                    <i class="fa-solid fa-arrow-right rss-article-arrow" aria-hidden="true"></i>
+                  </div>
+                </a>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  </>
+)}
+
+<script>
+// ===== RSS 卡片自动翻转（每 6 秒依次翻转一张有背面内容的卡片）=====
+let rssFlipInterval = null;
+let rssFlipCards = [];
+let rssCurrentFlipIndex = 0;
+
+function toggleCardFlip(container) {
+  const isFlipped = container.classList.toggle('flipped');
+  // iOS WebKit 修复：手动控制正反面的显示/隐藏（backface-visibility 在部分 iOS 版本上不可靠）
+  const frontCard = container.querySelector('.rss-article:not(.rss-article-back)');
+  const backCard = container.querySelector('.rss-article-back');
+  if (frontCard && backCard) {
+    frontCard.style.visibility = isFlipped ? 'hidden' : 'visible';
+    frontCard.style.opacity = isFlipped ? '0' : '1';
+    backCard.style.visibility = isFlipped ? 'visible' : 'hidden';
+    backCard.style.opacity = isFlipped ? '1' : '0';
+  }
+}
+
+function startAutoFlip() {
+  if (rssFlipCards.length === 0) return;
+  if (rssFlipInterval) clearInterval(rssFlipInterval);
+  rssFlipInterval = setInterval(() => {
+    if (document.hidden) return;
+    if (rssFlipCards[rssCurrentFlipIndex]) toggleCardFlip(rssFlipCards[rssCurrentFlipIndex]);
+    rssCurrentFlipIndex = (rssCurrentFlipIndex + 1) % rssFlipCards.length;
+  }, 6000);
+}
+
+function handleRSSVisibilityChange() {
+  if (document.hidden) {
+    if (rssFlipInterval) { clearInterval(rssFlipInterval); rssFlipInterval = null; }
+  } else {
+    startAutoFlip();
+  }
+}
+
+function initRSSCardAutoFlip() {
+  rssFlipCards = Array.from(document.querySelectorAll('.rss-card-container')).filter(c => c.querySelector('.rss-article-back'));
+  if (rssFlipCards.length === 0) return;
+  startAutoFlip();
+  document.addEventListener('visibilitychange', handleRSSVisibilityChange);
+}
+
+initRSSCardAutoFlip();
+
+// ===== 鼠标跟随光晕效果 =====
+document.querySelectorAll('.rss-card-container').forEach(el => {
+  el.addEventListener('mousemove', (e) => {
+    const rect = el.getBoundingClientRect();
+    el.style.setProperty('--mouse-x', `${((e.clientX - rect.left) / rect.width) * 100}%`);
+    el.style.setProperty('--mouse-y', `${((e.clientY - rect.top) / rect.height) * 100}%`);
+  });
+});
+</script>

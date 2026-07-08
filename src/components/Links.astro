@@ -1,0 +1,80 @@
+---
+import { links, linksConfig } from '../data/config.js';
+
+const enabledLinks = links.filter((l) => l.enabled !== false);
+
+// 邮箱反爬虫处理：反转字符串 + Base64 编码，点击时再反向解码
+function encodeEmail(email) {
+  const reversed = email.split('').reverse().join('');
+  return Buffer.from(reversed).toString('base64');
+}
+
+function processLinkUrl(link) {
+  const antiCrawler = link.antiCrawler !== false;
+  if (antiCrawler && link.url.startsWith('mailto:')) {
+    const encoded = encodeEmail(link.url.replace('mailto:', ''));
+    return {
+      href: 'javascript:void(0)',
+      onclick: `location.href='mailto:'+atob('${encoded}').split('').reverse().join('')`,
+      isEmail: true,
+    };
+  }
+  return {
+    href: link.url,
+    target: link.external ? '_blank' : undefined,
+    rel: link.external ? 'noopener noreferrer' : undefined,
+    isEmail: false,
+  };
+}
+---
+{linksConfig.enabled && enabledLinks.length > 0 && (
+  <>
+    <div class="divider divider-compact lazy-load" data-delay="4"></div>
+    <div class="links-section lazy-load" id="links-container" data-delay="4">
+      <div class="links-header">
+        <i class={linksConfig.title?.icon || 'fa-solid fa-link'}></i>
+        <span class="links-title">{linksConfig.title?.text || '链接导航'}</span>
+        <span class="section-count">{enabledLinks.length} links</span>
+      </div>
+      <div class="links">
+        {enabledLinks.map((link) => {
+          const { href, target, rel, onclick } = processLinkUrl(link);
+          return (
+            <a
+              href={href}
+              class="link"
+              data-brand={link.brand}
+              style={`--brand-color: ${link.color}`}
+              target={target}
+              rel={rel}
+              onclick={onclick}
+              aria-label={`${link.name} - ${link.description}`}
+            >
+              <div class="link-left">
+                <div class="link-icon-wrapper">
+                  <i class={link.icon} aria-hidden="true"></i>
+                </div>
+                <div class="link-content">
+                  <span class="link-text">{link.name}</span>
+                  <span class="link-description">{link.description}</span>
+                </div>
+              </div>
+              <span class="link-indicator" aria-hidden="true"></span>
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  </>
+)}
+
+<script>
+// 鼠标跟随光晕效果
+document.querySelectorAll('.link').forEach((el) => {
+  el.addEventListener('mousemove', (e) => {
+    const rect = el.getBoundingClientRect();
+    el.style.setProperty('--mouse-x', `${((e.clientX - rect.left) / rect.width) * 100}%`);
+    el.style.setProperty('--mouse-y', `${((e.clientY - rect.top) / rect.height) * 100}%`);
+  });
+});
+</script>

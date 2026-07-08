@@ -1,0 +1,9 @@
+---
+import { notice } from '../data/config.js';
+---
+{notice.enabled && (
+  <div class="notice {notice.type}">
+    <i class={notice.icon}></i>
+    <span>{notice.text}</span>
+  </div>
+)}

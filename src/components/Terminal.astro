@@ -1,0 +1,104 @@
+---
+import { terminal, identity, interests, gear, quotes } from '../data/config.js';
+
+const formatList = (arr) => arr.join(' / ');
+const hasGear = gear && gear.length > 0;
+---
+<div class="terminal lazy-load" id="terminal" data-delay="2" data-quotes={JSON.stringify(quotes)}>
+  <div class="terminal-header">
+    <div class="traffic-lights" aria-hidden="true">
+      <span class="close"></span>
+      <span class="minimize"></span>
+      <span class="maximize"></span>
+    </div>
+    <div class="title">{terminal.title}</div>
+  </div>
+  <div class="terminal-content" id="terminal-content">
+    <div class="prompt-line">
+      <span class="prompt">$ </span>
+      <span class="command">whoami</span>
+    </div>
+    <div class="output">{formatList(identity)}</div>
+
+    <div class="prompt-line" style="margin-top: 8px">
+      <span class="prompt">$ </span>
+      <span class="command">cat interests.txt</span>
+    </div>
+    <div class="output">{formatList(interests)}</div>
+
+    {hasGear && (
+      <>
+        <div class="prompt-line" style="margin-top: 8px">
+          <span class="prompt">$ </span>
+          <span class="command">cat gear.txt</span>
+        </div>
+        <div class="output">{formatList(gear)}</div>
+      </>
+    )}
+
+    <div class="prompt-line" style="margin-top: 8px">
+      <span class="prompt">$ </span>
+      <span class="command">./wisdom.sh</span>
+    </div>
+    <div class="output" id="quote-output" aria-live="polite"><span class="cursor-blink" aria-hidden="true"></span></div>
+  </div>
+</div>
+
+<script>
+// Quote cycling
+const terminalEl = document.getElementById('terminal');
+const quotes = terminalEl ? JSON.parse(terminalEl.dataset.quotes) : [];
+const quoteOutput = document.getElementById('quote-output');
+
+if (quoteOutput && Array.isArray(quotes) && quotes.length > 0) {
+  let index = 0;
+  const typingSpeed = 60;
+  const displayTime = 4000;
+  const deleteSpeed = 42;
+  let timeoutId = null;
+  let intervalId = null;
+
+  function typeText(text, done) {
+    let i = 0;
+    quoteOutput.textContent = '';
+    intervalId = setInterval(() => {
+      if (i < text.length) {
+        const cursor = document.createElement('span');
+        cursor.className = 'cursor-blink';
+        quoteOutput.textContent = text.slice(0, i + 1);
+        i++;
+      } else {
+        clearInterval(intervalId);
+        intervalId = null;
+        if (done) timeoutId = setTimeout(done, displayTime);
+      }
+    }, typingSpeed);
+  }
+
+  function deleteText(done) {
+    intervalId = setInterval(() => {
+      const current = quoteOutput.textContent;
+      if (current.length > 0) {
+        quoteOutput.textContent = current.slice(0, -1);
+      } else {
+        clearInterval(intervalId);
+        intervalId = null;
+        if (done) done();
+      }
+    }, deleteSpeed);
+  }
+
+  function cycle() {
+    typeText(quotes[index], () => {
+      deleteText(() => {
+        index = (index + 1) % quotes.length;
+        cycle();
+      });
+    });
+  }
+
+  // Initial display
+  quoteOutput.textContent = quotes[0];
+  setTimeout(cycle, 3000);
+}
+</script>

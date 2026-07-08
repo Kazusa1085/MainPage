@@ -1,0 +1,144 @@
+---
+import { nav, profile, rss, projects, linksConfig } from '../data/config.js';
+---
+
+<nav class="navbar" id="navbar">
+  <div class="navbar-inner">
+    <a href="/" class="navbar-brand" id="navbar-brand" aria-label="Home">
+      {nav.brand.showPrompt && <span class="prompt" aria-hidden="true">$ </span>}
+      <span class="brand-name">{profile.name}</span>
+    </a>
+
+    <div class="navbar-menu">
+      <a href="/" class="nav-link" aria-current="page"><i class="fa-solid fa-home"></i><span>首页</span></a>
+      {rss.enabled && <a href="/#rss-section" class="nav-link"><i class="fa-solid fa-newspaper"></i><span>文章</span></a>}
+      {projects.enabled && <a href="/#projects-section" class="nav-link"><i class="fa-solid fa-folder-open"></i><span>项目</span></a>}
+      {linksConfig.enabled && <a href="/#links-container" class="nav-link"><i class="fa-solid fa-link"></i><span>链接</span></a>}
+      {nav.menus?.map(menu => (
+        <a href={menu.items?.[0]?.url || '#'} class="nav-link"><span>{menu.name}</span></a>
+      ))}
+    </div>
+
+    <div class="navbar-actions">
+      <button class="nav-theme-toggle" id="nav-theme-toggle" aria-label="切换深色/浅色模式" title="切换深色/浅色模式">
+        <i class="fa-solid fa-moon" id="nav-theme-icon"></i>
+      </button>
+      <button class="navbar-toggle" id="navbar-toggle" aria-label="打开菜单" title="菜单" aria-expanded="false">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile nav dropdown -->
+  <div class="nav-mobile-dropdown" id="nav-mobile-dropdown" aria-hidden="true">
+    <a href="/" class="nav-mobile-link"><i class="fa-solid fa-home"></i><span>首页</span></a>
+    {rss.enabled && <a href="/#rss-section" class="nav-mobile-link"><i class="fa-solid fa-newspaper"></i><span>文章</span></a>}
+    {projects.enabled && <a href="/#projects-section" class="nav-mobile-link"><i class="fa-solid fa-folder-open"></i><span>项目</span></a>}
+    {linksConfig.enabled && <a href="/#links-container" class="nav-mobile-link"><i class="fa-solid fa-link"></i><span>链接</span></a>}
+  </div>
+</nav>
+
+<script>
+import { initTheme, getTheme } from '../scripts/theme.js';
+import { theme as themeConfig, profile as profileConfig, nav as navConfig } from '../data/config.js';
+
+// ===== Initialize Theme Manager =====
+initTheme(themeConfig.default);
+
+// ===== Scroll: navbar background =====
+const navbar = document.getElementById('navbar');
+if (navbar) {
+  const checkScroll = () => navbar.classList.toggle('scrolled', window.scrollY > 50);
+  window.addEventListener('scroll', checkScroll, { passive: true });
+  checkScroll();
+}
+
+// ===== Brand typing effect =====
+const brandEl = document.getElementById('navbar-brand');
+const nameEl = brandEl?.querySelector('.brand-name');
+if (nameEl) {
+  const originalName = profileConfig.name || 'Kazusa1085';
+  const hoverText = navConfig.brand?.hoverText || '~/whoami';
+  let showOriginal = true;
+
+  const typeText = (text, cb) => {
+    let i = 0;
+    nameEl.textContent = '';
+    const id = setInterval(() => {
+      if (i < text.length) { nameEl.textContent += text.charAt(i); i++; }
+      else { clearInterval(id); cb?.(); }
+    }, 80);
+  };
+  const deleteText = (cb) => {
+    const id = setInterval(() => {
+      if (nameEl.textContent.length > 0) nameEl.textContent = nameEl.textContent.slice(0, -1);
+      else { clearInterval(id); cb?.(); }
+    }, 40);
+  };
+
+  nameEl.textContent = originalName;
+  setInterval(() => {
+    const next = showOriginal ? hoverText : originalName;
+    showOriginal = !showOriginal;
+    deleteText(() => setTimeout(() => typeText(next), 200));
+  }, 3000);
+}
+
+// ===== Theme toggle：仅深色/浅色两态，点击直接切换 =====
+const themeToggle = document.getElementById('nav-theme-toggle');
+const themeIcon = document.getElementById('nav-theme-icon');
+
+function updateToggleIcon() {
+  const mgr = getTheme();
+  const mode = mgr ? mgr.getMode() : (document.documentElement.getAttribute('data-theme') || 'dark');
+  if (themeIcon) themeIcon.className = mode === 'dark' ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+  if (themeToggle) themeToggle.setAttribute('aria-label', mode === 'dark' ? '切换为浅色模式' : '切换为深色模式');
+}
+updateToggleIcon();
+
+themeToggle?.addEventListener('click', () => {
+  getTheme()?.toggle();
+  updateToggleIcon();
+});
+document.addEventListener('themechange', updateToggleIcon);
+
+// ===== Mobile nav dropdown =====
+const mobileToggle = document.getElementById('navbar-toggle');
+const mobileDropdown = document.getElementById('nav-mobile-dropdown');
+
+function toggleMobileNav() {
+  if (!mobileDropdown) return;
+  const isActive = mobileDropdown.classList.contains('is-active');
+  mobileDropdown.classList.toggle('is-active');
+  mobileDropdown.setAttribute('aria-hidden', String(!isActive));
+  if (mobileToggle) {
+    mobileToggle.setAttribute('aria-expanded', String(!isActive));
+    const icon = mobileToggle.querySelector('i');
+    if (icon) icon.className = isActive ? 'fa-solid fa-bars' : 'fa-solid fa-xmark';
+  }
+}
+
+mobileToggle?.addEventListener('click', e => {
+  e.stopPropagation();
+  toggleMobileNav();
+});
+
+document.addEventListener('click', e => {
+  if (mobileDropdown?.classList.contains('is-active') &&
+      !mobileDropdown.contains(e.target) && e.target !== mobileToggle) {
+    toggleMobileNav();
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && mobileDropdown?.classList.contains('is-active')) {
+    toggleMobileNav();
+    mobileToggle?.focus();
+  }
+});
+
+mobileDropdown?.querySelectorAll('.nav-mobile-link').forEach(link => {
+  link.addEventListener('click', () => {
+    if (mobileDropdown.classList.contains('is-active')) toggleMobileNav();
+  });
+});
+</script>

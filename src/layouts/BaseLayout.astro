@@ -1,0 +1,77 @@
+﻿---
+import { site, seo, pages as pageSeo, theme, analytics } from '../data/config.js';
+import { buildStyleString } from '../data/theme-data.js';
+import '../styles/global.css';
+
+const { title: homeTitle, description: homeDesc, og } = seo;
+const pageTitle = Astro.props.title || homeTitle;
+const pageDesc = Astro.props.description || homeDesc;
+const pageOgImage = Astro.props.ogImage || og.image;
+const pageKeywords = Astro.props.keywords || seo.keywords;
+const pageRobots = Astro.props.robots || '';
+
+// 仅深色/浅色两态，构建阶段直接生成两套完整 CSS 变量字符串
+const defaultMode = theme.default === 'light' ? 'light' : 'dark';
+const darkCSS = buildStyleString('dark');
+const lightCSS = buildStyleString('light');
+const themeCSS = ':root{' + (defaultMode === 'dark' ? darkCSS : lightCSS) + '}';
+
+// Analytics HTML
+let analyticsHTML = '';
+if (analytics.googleAnalytics.enabled && analytics.googleAnalytics.id) {
+  const id = analytics.googleAnalytics.id;
+  analyticsHTML += '<script async src=\"https://www.googletagmanager.com/gtag/js?id=' + id + '\"><\/script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag(\"js\",new Date());gtag(\"config\",\"' + id + '\");<\/script>';
+}
+if (analytics.microsoftClarity.enabled && analytics.microsoftClarity.id) {
+  const id = analytics.microsoftClarity.id;
+  analyticsHTML += '<script>(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src=\"https://www.clarity.ms/tag/' + id + '\";y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,\"clarity\",\"script\",\"' + id + '\");<\/script>';
+}
+if (analytics.umami) { analyticsHTML += analytics.umami; }
+if (analytics.customScripts && analytics.customScripts.length > 0) { analyticsHTML += analytics.customScripts.join('\n'); }
+---
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, shrink-to-fit=no" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDesc} />
+    <meta name="keywords" content={pageKeywords.join(', ')} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDesc} />
+    <meta property="og:image" content={pageOgImage} />
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:title" content={pageTitle} />
+    <meta property="twitter:description" content={pageDesc} />
+    <meta property="twitter:image" content={pageOgImage} />
+    {pageRobots && <meta name="robots" content={pageRobots} />}
+
+    <!-- Hardcoded theme CSS vars (FOUC-free, generated at build time) -->
+    <style set:html={themeCSS} />
+
+    <!-- MiSans Chinese font -->
+    <link rel="stylesheet" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/misans@4.1.0/lib/Normal/MiSans-Medium.min.css" />
+    <link rel="stylesheet" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/misans@4.1.0/lib/Normal/MiSans-Bold.min.css" />
+
+    <!-- Theme switcher: reads localStorage，在首次绘制前应用深色/浅色变量，防止闪烁(FOUC) -->
+    <script define:vars={{ defaultMode, darkCSS, lightCSS }}>
+    try {
+      var saved = JSON.parse(localStorage.getItem('homepage_theme'));
+      var mode = (saved && (saved.mode === 'light' || saved.mode === 'dark')) ? saved.mode : defaultMode;
+      document.documentElement.setAttribute('data-theme', mode);
+      document.documentElement.style.cssText = mode === 'dark' ? darkCSS : lightCSS;
+    } catch(e) {}
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.cn" />
+    <link rel="preconnect" href="https://fonts.gstatic.cn" crossorigin />
+    <link href="https://fonts.googleapis.cn/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="icon" type="image/x-icon" href="/images/icon.png" />
+    {analyticsHTML}
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

@@ -1,0 +1,15 @@
+---
+import { footer, site } from '../data/config.js';
+---
+<footer class="footer">
+  <div>
+    &copy; {footer.copyright.year}
+    <a href={footer.copyright.url} target="_blank" rel="noopener">{footer.copyright.name}</a>.
+    Powered by Kazusa1085 &amp; Astro
+  </div>
+  {footer.icp.enabled && (
+    <div class="footer-icp">
+      <a href={footer.icp.url} target="_blank" rel="noopener">{footer.icp.number}</a>
+    </div>
+  )}
+</footer>

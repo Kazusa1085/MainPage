@@ -1,0 +1,45 @@
+---
+import { music } from '../data/config.js';
+---
+{music.enabled ? (
+  <div class="music-area" id="music-area">
+    <button class="music-toggle" id="music-toggle" aria-label="切换音乐播放器" aria-expanded="false">
+      <i class="fa-solid fa-headphones"></i>
+      <span>音乐播放器</span>
+      <i class="fa-solid fa-chevron-down"></i>
+    </button>
+    <div id="music-player" class="music-player" style="display: none;" data-config={JSON.stringify(music)}>
+      <button id="music-prev" aria-label="上一首"><i class="fa-solid fa-backward-step"></i></button>
+      <button id="music-play" aria-label="播放/暂停"><i class="fa-solid fa-play" id="music-play-icon"></i></button>
+      <button id="music-next" aria-label="下一首"><i class="fa-solid fa-forward-step"></i></button>
+      <div class="music-title" id="music-title"><span>未加载</span></div>
+      <div class="music-progress" id="music-progress" tabindex="0" role="slider" aria-label="播放进度">
+        <div class="music-progress-fill" id="music-progress-fill"></div>
+      </div>
+      <span class="music-time" id="music-time">0:00 / 0:00</span>
+    </div>
+  </div>
+) : (
+  <div style="width: 100%; max-width: 600px; margin-bottom: 40px;">
+    <div class="music-divider"></div>
+  </div>
+)}
+
+<script>
+import { initMusicPlayer } from '../scripts/music.js';
+const playerEl = document.getElementById('music-player');
+if (playerEl) {{
+  try {{
+    const config = JSON.parse(playerEl.dataset.config);
+    initMusicPlayer(config);
+  }} catch(e) {{
+    console.warn('Music init failed:', e);
+  }}
+}}
+</script>
+
+<style>
+  .music-area.is-expanded .music-toggle i.fa-chevron-down { transform: rotate(180deg); }
+  .music-area.is-expanded #music-player { display: flex !important; }
+  .music-toggle i.fa-chevron-down { transition: transform 0.2s; }
+</style>

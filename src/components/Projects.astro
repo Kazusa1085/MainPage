@@ -1,0 +1,43 @@
+---
+import { projects } from '../data/config.js';
+import { fetchRepos } from '../data/fetch-github.js';
+
+const repos = projects.enabled ? await fetchRepos(projects.githubUser, projects.count, projects.exclude) : [];
+---
+{projects.enabled && repos.length > 0 && (
+  <div class="projects-carousel-wrapper" id="projects-section">
+    <div class="section-title">
+      <i class={projects.title?.icon || 'fa-solid fa-folder-open'}></i>
+      <span>{projects.title?.text || '我的项目'}</span>
+    </div>
+    <div class="projects-carousel-track" id="projects-carousel">
+      {repos.map(repo => (
+        <div class="project-card">
+          <h3><a href={repo.url} target="_blank" rel="noopener noreferrer">{repo.name}</a></h3>
+          {repo.description && <p>{repo.description}</p>}
+          <div style="display: flex; gap: 8px; margin-top: 8px; font-size: 12px; color: var(--text-secondary);">
+            {repo.language && <span>{repo.language}</span>}
+            <span>⭐ {repo.stars}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
+<script>
+// Simple project description truncation
+document.querySelectorAll('.project-card p').forEach(p => {
+  if (p.textContent.length > 120) {
+    p.textContent = p.textContent.slice(0, 120) + '...';
+  }
+});
+</script>
+
+<style>
+  .project-card { min-width: 100%; padding: 16px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg-secondary); }
+  .project-card h3 { font-size: 15px; margin-bottom: 6px; }
+  .project-card h3 a { color: var(--accent); text-decoration: none; }
+  .project-card h3 a:hover { text-decoration: underline; }
+  .projects-carousel-track { display: flex; flex-direction: column; gap: 12px; }
+</style>

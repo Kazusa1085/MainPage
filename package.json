@@ -1,22 +1,14 @@
 {
-  "name": "moehome",
-  "version": "2.2.0",
-  "description": "MoeWah Personal Homepage",
+  "name": "kazusa-homepage",
+  "version": "1.0.0",
+  "description": "Kazusa1085 Personal Homepage - Built with Astro",
+  "type": "module",
   "scripts": {
-    "build": "node scripts/build.js",
-    "dev": "echo '开发模式：直接打开 dist/index.html'",
-    "serve": "npx http-server dist -p 8080"
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
   },
-  "keywords": [
-    "homepage",
-    "personal-site"
-  ],
-  "author": "MoeWah",
-  "license": "MIT",
-  "devDependencies": {
-    "html-minifier-terser": "^7.2.0",
-    "lightningcss": "^1.31.1",
-    "sharp": "^0.34.5",
-    "terser": "^5.46.0"
+  "dependencies": {
+    "astro": "^7.0.6"
   }
 }
