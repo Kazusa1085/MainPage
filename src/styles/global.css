@@ -22,7 +22,7 @@ ul, ol { list-style: none; }
 
 :root {
   --navbar-height: 56px;
-  --z-dropdown: 600; --z-modal: 2000;
+  --z-dropdown: 600; --z-modal: 2000; --z-cursor: 9999;
   --radius-sm: 6px; --radius-md: 12px; --radius-lg: 16px;
   --font-sans: "Avenir Next", "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "MiSans", "Microsoft YaHei", sans-serif;
   --font-mono: "JetBrains Mono", "SF Mono", "Cascadia Code", Menlo, Monaco, Consolas, monospace;
@@ -42,6 +42,30 @@ ul, ol { list-style: none; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 .skip-link { position: absolute; top: -100px; left: 8px; padding: 8px 16px; background: var(--accent); color: #fff; z-index: 9999; border-radius: var(--radius-sm); transition: top 0.2s; }
 .skip-link:focus { top: 8px; }
+
+/* ------ 自定义跟随光标（仅精确指针设备，见 cursor-effects.js） ------ */
+.cursor {
+  width: 20px; height: 20px; border: 1px solid var(--accent); border-radius: 50%;
+  position: fixed; top: 0; left: 0; pointer-events: none; z-index: var(--z-cursor);
+  transition: transform var(--duration-fast) ease, opacity var(--duration-fast) ease;
+  will-change: transform;
+}
+.cursor.hover { transform: scale(2); background: var(--accent); opacity: 0.5; }
+@media (max-width: 768px) { .cursor { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .cursor { transition: none; }
+  .cursor.hover { transform: none; }
+}
+
+/* ------ 背景网格视差（持续流动 + 鼠标视差，见 cursor-effects.js） ------ */
+.grid-bg {
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100%;
+  background-image:
+    linear-gradient(var(--grid-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+  background-size: 50px 50px;
+  z-index: 0; pointer-events: none;
+}
 
 /* ------ Container ------ */
 .container { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 40px 20px; padding-top: calc(var(--navbar-height) + 40px); padding-bottom: 88px; width: 100%; max-width: 100%; }
@@ -369,5 +393,3 @@ body, .container, .rss-section, .links-section, .profile, .footer, .notice, .nav
   font-family: "Avenir Next", "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "MiSans", "Microsoft YaHei", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 .navbar-brand .brand-name { min-width: 7em; display: inline-block; }
-
-

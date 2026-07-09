@@ -73,5 +73,9 @@ if (analytics.customScripts && analytics.customScripts.length > 0) { analyticsHT
   </head>
   <body>
     <slot />
+    <script>
+      import { initCursorEffects } from '../scripts/cursor-effects.js';
+      initCursorEffects();
+    </script>
   </body>
 </html>

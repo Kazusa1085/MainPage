@@ -3,9 +3,7 @@ import { footer, site } from '../data/config.js';
 ---
 <footer class="footer">
   <div>
-    &copy; {footer.copyright.year}
-    <a href={footer.copyright.url} target="_blank" rel="noopener">{footer.copyright.name}</a>.
-    Powered by Kazusa1085 &amp; Astro
+    &copy; {footer.copyright.year} <a href={footer.copyright.url} target="_blank" rel="noopener">{footer.copyright.name}</a>.&nbsp;&nbsp;Powered by Kazusa1085 &amp; <a href="https://astro.build/" target="_blank" rel="noopener">Astro</a>
   </div>
   {footer.icp.enabled && (
     <div class="footer-icp">
