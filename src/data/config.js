@@ -56,8 +56,8 @@ export const favicon = {
   path: '/images/icon.png',
 };
 
-export const identity = ["Hi, I'm Kazusa1085.", '开源爱好者', 'AI探索者', '自动化实践者'];
-export const interests = ['Docker & 容器技术', 'NAS & 私有云', 'AI工具', '自动化部署'];
+export const identity = ["Hi, I'm Kazusa1085.", '开源爱好者', '炸板小能手', '摸鱼怪'];
+export const interests = ['Touch Fish🐟', 'NAS & HomeAssistant', '嵌入式Linux开发', '自动化部署'];
 export const gear = [];
 
 export const terminal = {
