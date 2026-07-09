@@ -57,15 +57,23 @@ ul, ol { list-style: none; }
   .cursor.hover { transform: none; }
 }
 
-/* ------ 背景网格视差（持续流动 + 鼠标视差，见 cursor-effects.js） ------ */
+/* ------ 背景网格（仅手机端生效，见原项目设计；纯CSS持续流动动画） ------ */
 .grid-bg {
   position: fixed; top: 0; left: 0; width: 100vw; height: 100%;
   background-image:
     linear-gradient(var(--grid-color) 1px, transparent 1px),
     linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
   background-size: 50px 50px;
+  transform: perspective(500px) rotateX(60deg);
+  animation: gridMove 8s linear infinite;
   z-index: 0; pointer-events: none;
 }
+@keyframes gridMove {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 50px; }
+}
+@media (min-width: 769px) { .grid-bg { display: none; } }
+@media (prefers-reduced-motion: reduce) { .grid-bg { animation: none; } }
 
 /* ------ Container ------ */
 .container { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 40px 20px; padding-top: calc(var(--navbar-height) + 40px); padding-bottom: 88px; width: 100%; max-width: 100%; }
@@ -101,6 +109,18 @@ ul, ol { list-style: none; }
 .profile { text-align: center; width: 100%; max-width: 600px; }
 .avatar-wrapper { position: relative; width: 140px; height: 140px; margin: 0 auto 40px; flex-shrink: 0; }
 .avatar { width: 100%; height: 100%; border-radius: 50%; overflow: hidden; border: 3px solid var(--accent); box-shadow: 0 0 0 4px var(--bg-primary), 0 0 40px var(--accent-dim), 0 20px 60px rgba(0,0,0,0.5); }
+.status {
+  position: absolute; bottom: 10px; right: 10px; width: 18px; height: 18px;
+  background: var(--accent); border: 3px solid var(--bg-primary); border-radius: 50%;
+  animation: statusPulse 2s ease-in-out infinite;
+}
+@keyframes statusPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.7; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .status { animation: none; }
+}
 .avatar img { width: 100%; height: 100%; object-fit: cover; aspect-ratio: 1; }
 .name { font-family: var(--font-mono); font-size: clamp(2rem, 6vw, 3.5rem); font-weight: 600; margin-bottom: 10px; color: var(--text-primary); }
 .tagline { font-size: clamp(0.9rem, 2vw, 1.1rem); color: var(--text-secondary); margin-bottom: 40px; font-weight: 300; display: flex; align-items: center; justify-content: center; gap: 8px; }

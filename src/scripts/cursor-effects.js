@@ -1,5 +1,5 @@
-// 全局鼠标动效：自定义跟随光标 + 背景网格视差
-// 移植自 MoeHome 原项目的 CustomCursor / GridParallax
+// 全局鼠标动效：自定义跟随光标 + 背景网格（仅手机端显示，见 global.css 中 .grid-bg 的响应式规则）
+// 移植自 MoeHome 原项目的 CustomCursor
 
 const prefersReducedMotion = () =>
   window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -65,55 +65,13 @@ class CustomCursor {
   }
 }
 
-/**
- * GridParallax - 背景网格视差
- * 注意：原项目里"持续下移"用 CSS @keyframes、"鼠标视差"用 JS 直接改 inline transform，
- * 两者会互相覆盖导致鼠标视差基本不可见。这里改为由 JS 在同一个 rAF 循环里
- * 把"持续滚动位移"与"鼠标视差偏移"合并计算，两个效果才能同时生效。
- */
-class GridParallax {
-  constructor() {
-    this.gridBg = null;
-    this.mouseX = 0;
-    this.mouseY = 0;
-    this.scrollOffset = 0;
-    this.animationId = null;
-  }
-
-  init() {
-    this.gridBg = document.querySelector('.grid-bg');
-    if (!this.gridBg) {
-      this.gridBg = document.createElement('div');
-      this.gridBg.className = 'grid-bg';
-      document.body.insertBefore(this.gridBg, document.body.firstChild);
-    }
-    this.bindEvents();
-    this.animate();
-  }
-
-  bindEvents() {
-    document.addEventListener('mousemove', (e) => {
-      this.mouseX = (e.clientX - window.innerWidth / 2) * 0.01;
-      this.mouseY = (e.clientY - window.innerHeight / 2) * 0.01;
-    });
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) this.stopAnimation();
-      else this.animate();
-    });
-  }
-
-  animate() {
-    // 网格背景 background-size 为 50px，偏移循环到 50 后归零，形成连续流动的错觉
-    this.scrollOffset = (this.scrollOffset + 0.15) % 50;
-    const translateY = this.scrollOffset + this.mouseY;
-    this.gridBg.style.transform =
-      `perspective(500px) rotateX(60deg) translateY(${translateY}px) translateX(${this.mouseX}px)`;
-    this.animationId = requestAnimationFrame(() => this.animate());
-  }
-
-  stopAnimation() {
-    if (this.animationId) { cancelAnimationFrame(this.animationId); this.animationId = null; }
-  }
+// 背景网格：仅手机端可见（见 global.css @media (min-width:769px){display:none}），
+// 持续流动动效完全由 CSS @keyframes 驱动，这里只需要把元素插入 DOM
+function initGridBackground() {
+  if (document.querySelector('.grid-bg')) return;
+  const gridBg = document.createElement('div');
+  gridBg.className = 'grid-bg';
+  document.body.insertBefore(gridBg, document.body.firstChild);
 }
 
 export function initCursorEffects() {
@@ -121,5 +79,5 @@ export function initCursorEffects() {
   if (prefersReducedMotion()) return;
   // 只在有精确指针(鼠标)的设备上启用跟随光标，触屏设备没有意义
   if (hasFinePointer()) new CustomCursor().init();
-  new GridParallax().init();
+  initGridBackground();
 }
