@@ -57,7 +57,7 @@ ul, ol { list-style: none; }
   .cursor.hover { transform: none; }
 }
 
-/* ------ 背景网格（仅手机端生效，见原项目设计；纯CSS持续流动动画） ------ */
+/* ------ 背景网格（全端显示；持续流动由CSS驱动，桌面端额外叠加JS鼠标视差） ------ */
 .grid-bg {
   position: fixed; top: 0; left: 0; width: 100vw; height: 100%;
   background-image:
@@ -72,7 +72,6 @@ ul, ol { list-style: none; }
   0% { background-position: 0 0; }
   100% { background-position: 0 50px; }
 }
-@media (min-width: 769px) { .grid-bg { display: none; } }
 @media (prefers-reduced-motion: reduce) { .grid-bg { animation: none; } }
 
 /* ------ Container ------ */
