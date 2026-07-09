@@ -60,28 +60,51 @@ if (nameEl) {
   const originalName = profileConfig.name || 'Kazusa1085';
   const hoverText = navConfig.brand?.hoverText || '~/whoami';
   let showOriginal = true;
+  let typeIntervalId = null;
+  let deleteIntervalId = null;
+  let cycleTimeoutId = null;
+
+  // 清除所有正在运行的计时器：避免长时间切到后台被浏览器节流后，
+  // 切回前台时新一轮动画在上一轮还没跑完的情况下启动，导致文字叠加
+  function clearBrandTimers() {
+    if (typeIntervalId) { clearInterval(typeIntervalId); typeIntervalId = null; }
+    if (deleteIntervalId) { clearInterval(deleteIntervalId); deleteIntervalId = null; }
+    if (cycleTimeoutId) { clearTimeout(cycleTimeoutId); cycleTimeoutId = null; }
+  }
 
   const typeText = (text, cb) => {
     let i = 0;
     nameEl.textContent = '';
-    const id = setInterval(() => {
+    typeIntervalId = setInterval(() => {
       if (i < text.length) { nameEl.textContent += text.charAt(i); i++; }
-      else { clearInterval(id); cb?.(); }
+      else { clearInterval(typeIntervalId); typeIntervalId = null; cb?.(); }
     }, 80);
   };
   const deleteText = (cb) => {
-    const id = setInterval(() => {
+    deleteIntervalId = setInterval(() => {
       if (nameEl.textContent.length > 0) nameEl.textContent = nameEl.textContent.slice(0, -1);
-      else { clearInterval(id); cb?.(); }
+      else { clearInterval(deleteIntervalId); deleteIntervalId = null; cb?.(); }
     }, 40);
   };
 
-  nameEl.textContent = originalName;
-  setInterval(() => {
+  function runBrandCycle() {
+    clearBrandTimers(); // 保险：确保任意时刻只有一套动画在跑
     const next = showOriginal ? hoverText : originalName;
     showOriginal = !showOriginal;
-    deleteText(() => setTimeout(() => typeText(next), 200));
-  }, 3000);
+    deleteText(() => { cycleTimeoutId = setTimeout(() => typeText(next), 200); });
+  }
+
+  nameEl.textContent = originalName;
+  setInterval(runBrandCycle, 3000);
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      clearBrandTimers(); // 切到后台：停掉计时器，避免被节流后错位
+    } else {
+      clearBrandTimers(); // 切回前台：重置为干净状态，等下一次周期自然继续
+      nameEl.textContent = showOriginal ? originalName : hoverText;
+    }
+  });
 }
 
 // ===== Theme toggle：仅深色/浅色两态，点击直接切换 =====
