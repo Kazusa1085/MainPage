@@ -389,9 +389,6 @@ ul, ol { list-style: none; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
 
-/* ------ Background Pattern ------ */
-.profile::before { content: ''; position: fixed; inset: 0; z-index: -1; background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 60px 60px; opacity: 0.3; pointer-events: none; }
-
 /* ------ Glass Effects ------ */
 .project-card, .music-player { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
 
@@ -416,3 +413,5 @@ body, .container, .rss-section, .links-section, .profile, .footer, .notice, .nav
   font-family: "Avenir Next", "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "MiSans", "Microsoft YaHei", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 .navbar-brand .brand-name { min-width: 7em; display: inline-block; }
+
+
