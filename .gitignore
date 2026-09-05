@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Astro build output and cache
+dist/
+.astro/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment
+.env
+.env.*
