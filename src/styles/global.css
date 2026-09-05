@@ -399,6 +399,119 @@ body, .container, .rss-section, .links-section, .profile, .footer, .notice, .nav
 }
 .navbar-brand .brand-name { min-width: 7em; display: inline-block; }
 
+/* ------ Full Terminal App ------ */
+.terminal-app {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  width: 100%;
+  background: rgba(2, 5, 10, 0.78);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+}
+html[data-theme='light'] .terminal-app {
+  background: rgba(250, 251, 253, 0.86);
+}
+.terminal-titlebar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--border);
+}
+.terminal-title {
+  flex: 1;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  opacity: 0.75;
+  letter-spacing: 0.06em;
+}
+.terminal-theme-toggle {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color var(--duration-snappy) ease, background var(--duration-snappy) ease, border-color var(--duration-snappy) ease;
+}
+.terminal-theme-toggle:hover {
+  color: var(--accent);
+  background: var(--hover-bg);
+  border-color: var(--border);
+}
+.terminal-screen {
+  flex: 1;
+  overflow-y: auto;
+  padding: clamp(16px, 4vw, 40px) clamp(14px, 4vw, 48px) 32px;
+  outline: none;
+}
+.terminal-output {
+  max-width: 900px;
+  margin: 0 auto;
+  line-height: 1.65;
+}
+.terminal-line {
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--text-primary);
+}
+.terminal-line.cmd {
+  color: var(--accent);
+}
+.terminal-line.muted {
+  color: var(--text-secondary);
+}
+.terminal-input-form {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) clamp(14px, 4vw, 48px);
+  border-top: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.22);
+}
+html[data-theme='light'] .terminal-input-form {
+  background: rgba(255, 255, 255, 0.18);
+}
+.terminal-prompt {
+  color: var(--accent);
+  font-family: var(--font-mono);
+}
+.terminal-input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font: inherit;
+  caret-color: var(--accent);
+}
+.terminal-input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.55;
+}
+.terminal-statusbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) clamp(14px, 4vw, 48px);
+  border-top: 1px solid var(--border);
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+  opacity: 0.8;
+  font-family: var(--font-mono);
+}
+
 /* ------ Terminal Dashboard Layout ------ */
 .terminal-dashboard {
   position: relative;

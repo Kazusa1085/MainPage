@@ -1,0 +1,222 @@
+---
+import { identity, interests, gear, quotes, site, profile, nav, links as linksData, rss as rssConfig, projects as projectsConfig, theme } from '../data/config.js';
+import { fetchArticles } from '../data/fetch-rss.js';
+import { fetchRepos } from '../data/fetch-github.js';
+
+const articles = rssConfig.enabled ? await fetchArticles(rssConfig.url, rssConfig.count) : [];
+const repos = projectsConfig.enabled ? await fetchRepos(projectsConfig.githubUser, projectsConfig.count, projectsConfig.exclude) : [];
+const defaultMode = theme.default === 'light' ? 'light' : 'dark';
+---
+
+<div class="terminal-app">
+  <div class="terminal-titlebar">
+    <div class="traffic-lights" aria-hidden="true">
+      <span class="close"></span>
+      <span class="minimize"></span>
+      <span class="maximize"></span>
+    </div>
+    <span class="terminal-title">kazusa@raana:~</span>
+    <button class="terminal-theme-toggle" id="terminal-theme-toggle" aria-label="切换深浅色模式" title="切换深浅色模式">
+      <i class="fa-solid fa-moon" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  <div class="terminal-screen" id="terminal-screen" tabindex="0" aria-label="终端输出">
+    <div class="terminal-output" id="terminal-output"></div>
+  </div>
+
+  <form class="terminal-input-form" id="terminal-form">
+    <label class="terminal-prompt" for="terminal-input" aria-hidden="true">$</label>
+    <input
+      id="terminal-input"
+      class="terminal-input"
+      type="text"
+      autocomplete="off"
+      autocapitalize="off"
+      spellcheck="false"
+      aria-label="终端命令输入"
+      placeholder="Type 'help' to get started"
+    />
+  </form>
+
+  <div class="terminal-statusbar">
+    <span>raana.icu</span>
+    <span id="terminal-clock"></span>
+  </div>
+</div>
+
+<script define:vars={{ identity, interests, gear, quotes, articles, repos, linksData, site, defaultMode }}>
+import { initTheme, getTheme } from '../scripts/theme.js';
+
+initTheme(defaultMode);
+
+const screen = document.getElementById('terminal-screen');
+const output = document.getElementById('terminal-output');
+const input = document.getElementById('terminal-input');
+const form = document.getElementById('terminal-form');
+const clock = document.getElementById('terminal-clock');
+const themeToggle = document.getElementById('terminal-theme-toggle');
+const themeIcon = themeToggle?.querySelector('i');
+
+let ghostPrompt = false;
+
+function print(text, cls = '') {
+  const line = document.createElement('div');
+  line.className = `terminal-line ${cls}`.trim();
+  if (text === '') {
+    line.innerHTML = '&nbsp;';
+  } else {
+    line.textContent = text;
+  }
+  output.appendChild(line);
+  screen.scrollTop = screen.scrollHeight;
+}
+
+function printList(items) {
+  items.forEach((item) => print(item));
+}
+
+function clearScreen() {
+  output.innerHTML = '';
+}
+
+function updateThemeIcon() {
+  const mode = getTheme()?.getMode() || document.documentElement.getAttribute('data-theme') || 'dark';
+  if (themeIcon) themeIcon.className = mode === 'dark' ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+  if (themeToggle) themeToggle.setAttribute('aria-label', mode === 'dark' ? '切换为浅色模式' : '切换为深色模式');
+}
+
+function toggleTheme() {
+  getTheme()?.toggle();
+  updateThemeIcon();
+}
+
+function execute(raw) {
+  const [cmd] = raw.split(/\s+/);
+  const args = raw.split(/\s+/).slice(1);
+
+  switch (cmd) {
+    case 'help':
+      print('Available commands:', 'muted');
+      print('  help              show this help');
+      print('  whoami            about me');
+      print('  cat interests     my interests');
+      print('  cat gear          my gear');
+      print('  ls                list sections');
+      print('  posts             recent blog posts');
+      print('  projects          open-source projects');
+      print('  links             contact & links');
+      print('  neofetch          system info');
+      print('  theme             toggle dark/light');
+      print('  clear             clear terminal');
+      break;
+    case 'whoami':
+      print(identity.join(' / '));
+      break;
+    case 'cat':
+      if (args[0] === 'interests') {
+        print(interests.join(' / '));
+      } else if (args[0] === 'gear') {
+        print(gear.length ? gear.join(' / ') : 'no gear configured');
+      } else {
+        print('usage: cat interests|gear');
+      }
+      break;
+    case 'ls':
+      print('posts  projects  links  profile');
+      break;
+    case 'posts':
+      if (articles.length === 0) {
+        print('No recent posts.');
+      } else {
+        articles.forEach((a, i) => {
+          print(`${i + 1}. ${a.title}  [${a.date || 'date unknown'}]`);
+          print(`   ${a.link}`);
+        });
+      }
+      break;
+    case 'projects':
+      if (repos.length === 0) {
+        print('No projects enabled.');
+      } else {
+        repos.forEach((r) => {
+          print(`- ${r.name}  ★${r.stars}  ${r.language || ''}`);
+          print(`  ${r.url}`);
+          if (r.description) print(`  ${r.description}`);
+        });
+      }
+      break;
+    case 'links':
+      linksData.filter((l) => l.enabled !== false).forEach((l) => {
+        print(`- ${l.name}  ->  ${l.url}`);
+      });
+      break;
+    case 'neofetch':
+      print('        ▄▄▄▄▄▄▄▄▄▄▄        ' + site.name);
+      print('      ▄█▀▀▀▀▀▀▀▀▀▀▀▀▀█▄      OS: Astro ' + defaultMode);
+      print('      █  ▄▄▄▄▄▄▄▄▄▄▄  █      Host: raana.icu');
+      print('     █ ▄█▀▀▀▀▀▀▀▀▀▀█▄ █      Uptime: ∞');
+      print('     █ ▀▀▀▀▀▀▀▀▀▀▀▀▀▀ █      Theme: ' + (getTheme()?.getMode() || defaultMode));
+      print('      ▀█▄▄▄▄▄▄▄▄▄▄▄▄▄█▀      Shell: zsh');
+      print('        ▀▀▀▀▀▀▀▀▀▀▀▀▀        ' + (profile.tagline.highlight || ''));
+      break;
+    case 'theme':
+      toggleTheme();
+      print('Theme toggled.');
+      break;
+    case 'clear':
+      clearScreen();
+      break;
+    default:
+      print(`command not found: ${cmd}`);
+      print("Type 'help' to see available commands.");
+  }
+}
+
+function updateClock() {
+  if (clock) clock.textContent = new Date().toLocaleTimeString('zh-CN', { hour12: false });
+}
+
+function boot() {
+  updateClock();
+  setInterval(updateClock, 1000);
+  print('Last login: ' + new Date().toLocaleString('zh-CN'), 'muted');
+  print('');
+  print('Welcome to ' + site.name + "'s terminal.");
+  print("Type 'help' to see available commands.");
+  print('');
+  screen.focus();
+}
+
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const raw = input.value.trim();
+  if (!raw) return;
+  print('$ ' + raw, 'cmd');
+  execute(raw);
+  input.value = '';
+});
+
+document.addEventListener('keydown', (e) => {
+  if (document.activeElement !== input && !/INPUT|TEXTAREA/.test(document.activeElement?.tagName || '')) {
+    if (e.key.length === 1 || e.key === 'Backspace') {
+      input.focus();
+    }
+  }
+});
+
+window.addEventListener('click', () => {
+  if (window.getSelection()?.toString()) return;
+  input.focus();
+});
+
+screen.addEventListener('click', () => input.focus());
+
+themeToggle?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  toggleTheme();
+});
+
+updateThemeIcon();
+boot();
+</script>
