@@ -17,10 +17,10 @@ const PALETTES = {
     nebula2: [94, 129, 172],
     accent: [136, 192, 208],
     star: [76, 86, 106],
-    nebulaAlpha: 0.05,
-    starAlpha: 0.18,
-    meteorAlpha: 0.1,
-    stars: 24,
+    nebulaAlpha: 0.1,
+    starAlpha: 0.26,
+    meteorAlpha: 0.14,
+    stars: 28,
   },
 };
 
@@ -204,6 +204,8 @@ class BackgroundCanvas {
     if (isDark) {
       ctx.fillStyle = '#000';
       ctx.fillRect(0, 0, w, h);
+    } else {
+      this.renderLightBase(ctx, w, h);
     }
 
     ctx.save();
@@ -214,6 +216,15 @@ class BackgroundCanvas {
     this.renderStars(ctx, w, h, palette, reduced);
 
     ctx.restore();
+  }
+
+  renderLightBase(ctx, w, h) {
+    const g = ctx.createLinearGradient(0, 0, 0, h);
+    g.addColorStop(0, 'rgba(246, 248, 251, 0.65)');
+    g.addColorStop(0.5, 'rgba(229, 233, 240, 0)');
+    g.addColorStop(1, 'rgba(170, 188, 208, 0.32)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
   }
 
   renderNebula(ctx, w, h, palette, reduced) {
