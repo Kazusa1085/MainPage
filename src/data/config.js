@@ -4,7 +4,7 @@
 export const site = {
   name: 'Kazusa1085',
   tagline: '寄术博主 / 炸板小能手 / 摸鱼怪',
-  url: '',
+  url: 'https://www.raana.icu',
   ogImage: 'https://avatars.githubusercontent.com/u/195487617?v=4',
 };
 

@@ -13,7 +13,7 @@ import { music } from '../data/config.js';
       <button id="music-play" aria-label="播放/暂停"><i class="fa-solid fa-play" id="music-play-icon"></i></button>
       <button id="music-next" aria-label="下一首"><i class="fa-solid fa-forward-step"></i></button>
       <div class="music-title" id="music-title"><span>未加载</span></div>
-      <div class="music-progress" id="music-progress" tabindex="0" role="slider" aria-label="播放进度">
+      <div class="music-progress" id="music-progress" tabindex="0" role="slider" aria-label="播放进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
         <div class="music-progress-fill" id="music-progress-fill"></div>
       </div>
       <span class="music-time" id="music-time">0:00 / 0:00</span>

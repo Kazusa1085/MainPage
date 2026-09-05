@@ -104,6 +104,11 @@ export class MusicPlayer {
     this.audio.currentTime = ((e.clientX - rect.left) / rect.width) * this.audio.duration;
   }
 
+  seekBy(seconds) {
+    if (!this.audio.duration) return;
+    this.audio.currentTime = Math.max(0, Math.min(this.audio.duration, this.audio.currentTime + seconds));
+  }
+
   formatTime(s) {
     if (isNaN(s)) return '0:00';
     return `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
@@ -115,6 +120,15 @@ export class MusicPlayer {
     el.prevBtn?.addEventListener('click', () => this.prev(true));
     el.nextBtn?.addEventListener('click', () => this.next(true));
     el.progress?.addEventListener('click', (e) => this.seekTo(e));
+    el.progress?.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        this.seekBy(-5);
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        this.seekBy(5);
+      }
+    });
 
     this.audio.addEventListener('timeupdate', () => this.updateProgress());
     this.audio.addEventListener('ended', () => this.next(true));
@@ -124,11 +138,14 @@ export class MusicPlayer {
   }
 
   updateProgress() {
-    if (this.elements.progressFill && this.audio.duration) {
-      this.elements.progressFill.style.width = `${(this.audio.currentTime / this.audio.duration) * 100}%`;
+    const { progress, progressFill, timeDisplay } = this.elements;
+    if (this.audio.duration) {
+      const percent = (this.audio.currentTime / this.audio.duration) * 100;
+      if (progressFill) progressFill.style.width = `${percent}%`;
+      if (progress) progress.setAttribute('aria-valuenow', String(Math.round(percent)));
     }
-    if (this.elements.timeDisplay) {
-      this.elements.timeDisplay.textContent = `${this.formatTime(this.audio.currentTime)} / ${this.formatTime(this.audio.duration)}`;
+    if (timeDisplay) {
+      timeDisplay.textContent = `${this.formatTime(this.audio.currentTime)} / ${this.formatTime(this.audio.duration)}`;
     }
   }
 

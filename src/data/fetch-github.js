@@ -1,10 +1,11 @@
 // GitHub data fetcher (build-time only)
+import { fetchWithTimeout } from './fetch-utils.js';
 
 export async function fetchRepos(githubUserUrl, count = 5, exclude = []) {
   if (!githubUserUrl) return [];
   try {
     const username = githubUserUrl.replace(/https?:\/\/github\.com\//, '').replace(/\/$/, '');
-    const res = await fetch(`https://api.github.com/users/${username}/repos?per_page=100&sort=updated`);
+    const res = await fetchWithTimeout(`https://api.github.com/users/${username}/repos?per_page=100&sort=updated`);
     if (!res.ok) return [];
     const repos = await res.json();
     return repos
@@ -29,8 +30,8 @@ export async function fetchContributions(githubUserUrl) {
   if (!githubUserUrl) return [];
   const username = githubUserUrl.replace(/https?:\/\/github\.com\//, '').replace(/\/$/, '');
   try {
-    // Use GitHub GraphQL API for contribution data (requires token for best results)
-    const res = await fetch(`https://github.com/users/${username}/contributions`);
+    const res = await fetchWithTimeout(`https://github.com/users/${username}/contributions`);
+    if (!res.ok) return [];
     const html = await res.text();
     const days = [];
     const rectRegex = /<rect[^>]*data-count="(\d+)"[^>]*data-date="([^"]+)"/g;

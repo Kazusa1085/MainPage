@@ -45,6 +45,8 @@ const hasGear = gear && gear.length > 0;
 </div>
 
 <script>
+import { animation } from '../data/config.js';
+
 // Quote cycling
 const terminalEl = document.getElementById('terminal');
 const quotes = terminalEl ? JSON.parse(terminalEl.dataset.quotes) : [];
@@ -52,9 +54,10 @@ const quoteOutput = document.getElementById('quote-output');
 
 if (quoteOutput && Array.isArray(quotes) && quotes.length > 0) {
   let index = 0;
-  const typingSpeed = 60;
-  const displayTime = 4000;
-  const deleteSpeed = 42;
+  const typingSpeed = animation.typingSpeed;
+  const displayTime = animation.quoteDisplayTime;
+  const deleteSpeed = animation.quoteDeleteSpeed;
+  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let timeoutId = null;
   let intervalId = null;
 
@@ -99,6 +102,15 @@ if (quoteOutput && Array.isArray(quotes) && quotes.length > 0) {
 
   // Initial display
   quoteOutput.textContent = quotes[0];
-  setTimeout(cycle, 3000);
+
+  if (reduceMotion) {
+    // 减少动画偏好：直接按间隔切换，不逐字输入/删除
+    setInterval(() => {
+      index = (index + 1) % quotes.length;
+      quoteOutput.textContent = quotes[index];
+    }, displayTime);
+  } else {
+    setTimeout(cycle, 3000);
+  }
 }
 </script>

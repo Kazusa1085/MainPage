@@ -117,6 +117,7 @@ function handleRSSVisibilityChange() {
 function initRSSCardAutoFlip() {
   rssFlipCards = Array.from(document.querySelectorAll('.rss-card-container')).filter(c => c.querySelector('.rss-article-back'));
   if (rssFlipCards.length === 0) return;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   startAutoFlip();
   document.addEventListener('visibilitychange', handleRSSVisibilityChange);
 }

@@ -63,6 +63,7 @@ if (nameEl) {
   let typeIntervalId = null;
   let deleteIntervalId = null;
   let cycleTimeoutId = null;
+  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // 清除所有正在运行的计时器：避免长时间切到后台被浏览器节流后，
   // 切回前台时新一轮动画在上一轮还没跑完的情况下启动，导致文字叠加
@@ -95,16 +96,19 @@ if (nameEl) {
   }
 
   nameEl.textContent = originalName;
-  setInterval(runBrandCycle, 3000);
 
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-      clearBrandTimers(); // 切到后台：停掉计时器，避免被节流后错位
-    } else {
-      clearBrandTimers(); // 切回前台：重置为干净状态，等下一次周期自然继续
-      nameEl.textContent = showOriginal ? originalName : hoverText;
-    }
-  });
+  if (!reduceMotion) {
+    setInterval(runBrandCycle, 3000);
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        clearBrandTimers(); // 切到后台：停掉计时器，避免被节流后错位
+      } else {
+        clearBrandTimers(); // 切回前台：重置为干净状态，等下一次周期自然继续
+        nameEl.textContent = showOriginal ? originalName : hoverText;
+      }
+    });
+  }
 }
 
 // ===== Theme toggle：仅深色/浅色两态，点击直接切换 =====

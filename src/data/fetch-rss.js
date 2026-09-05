@@ -1,9 +1,10 @@
 // RSS feed fetcher (build-time only)
+import { fetchWithTimeout } from './fetch-utils.js';
 
 export async function fetchArticles(rssUrl, count = 4) {
   if (!rssUrl) return [];
   try {
-    const res = await fetch(rssUrl);
+    const res = await fetchWithTimeout(rssUrl);
     const xml = await res.text();
     const items = [];
 

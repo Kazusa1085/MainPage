@@ -19,15 +19,20 @@ npm install  # 安装依赖
 ### 开发
 
 ```bash
+npm run dev
+# 访问 http://localhost:4321
+
 npm run build
 # 本地预览
 npm run preview
-# 访问 http://localhost:43210
 ```
 
 ## 配置说明
 
-正在编写中......
+- 站点信息、导航、RSS、链接、音乐、主题默认模式等：`src/data/config.js`
+- 深色/浅色主题色板：`src/data/theme-data.js`
+- Astro 构建配置：`astro.config.mjs`
+- 组件位于 `src/components/`，页面位于 `src/pages/`
 
 ## 赞赏/捐赠
 

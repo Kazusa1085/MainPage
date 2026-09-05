@@ -42,12 +42,14 @@ import Footer from '../components/Footer.astro';
 </BaseLayout>
 
 <script>
+import { animation } from '../data/config.js';
+
 // Skeleton screen: show content after a delay
 const skeleton = document.getElementById('skeleton-screen');
 const content = document.getElementById('actual-content');
 
 // Fade in content after skeleton delay
-const fadeInDelay = 1000; // matches animation config
+const fadeInDelay = animation.fadeInDelay;
 setTimeout(() => {
   if (skeleton) skeleton.style.opacity = '0';
   if (content) {
