@@ -1,7 +1,5 @@
-// Canvas-based animated background: deep, mostly calm black nebula flow.
-// A bright light band only sweeps across occasionally, like a passing comet.
-// The design keeps a layered/volumetric feel through multiple soft nebula clouds
-// and sparse star particles, rather than a constant loud decorative layer.
+// Canvas-based animated background: mostly calm black nebula with occasional
+// fast shooting-star meteors that leave a long, fading trail.
 
 const PALETTES = {
   dark: {
@@ -10,8 +8,8 @@ const PALETTES = {
     accent: [0, 255, 159],
     star: [255, 255, 255],
     nebulaAlpha: 0.08,
-    beamAlpha: 0.2,
     starAlpha: 0.4,
+    meteorAlpha: 0.22,
     stars: 38,
   },
   light: {
@@ -20,8 +18,8 @@ const PALETTES = {
     accent: [136, 192, 208],
     star: [76, 86, 106],
     nebulaAlpha: 0.05,
-    beamAlpha: 0.08,
     starAlpha: 0.18,
+    meteorAlpha: 0.1,
     stars: 24,
   },
 };
@@ -147,20 +145,20 @@ class BackgroundCanvas {
     const w = this.width;
     const h = this.height;
     const accent = this.palette.accent;
-    const startX = w * (0.15 + Math.random() * 0.7);
-    const startY = h * (0.05 + Math.random() * 0.4);
+    const startX = w * (0.05 + Math.random() * 0.8);
+    const startY = h * (0.02 + Math.random() * 0.42);
     const direction = Math.random() < 0.5 ? -1 : 1;
-    const dx = direction * (w * (0.08 + Math.random() * 0.08));
-    const dy = h * (0.08 + Math.random() * 0.1);
+    const dx = direction * (w * (0.16 + Math.random() * 0.14));
+    const dy = h * (0.14 + Math.random() * 0.12);
     this.meteors.push({
       x: startX,
       y: startY,
       dx,
       dy,
-      duration: 0.7 + Math.random() * 0.7,
+      duration: 0.26 + Math.random() * 0.22,
       life: 0,
       progress: 0,
-      trail: 0.12 + Math.random() * 0.08,
+      trail: 0.4 + Math.random() * 0.22,
       color: accent,
     });
   }
@@ -177,18 +175,19 @@ class BackgroundCanvas {
 
       const gradient = ctx.createLinearGradient(tailX, tailY, headX, headY);
       gradient.addColorStop(0, `rgba(${m.color[0]}, ${m.color[1]}, ${m.color[2]}, 0)`);
-      gradient.addColorStop(1, `rgba(${m.color[0]}, ${m.color[1]}, ${m.color[2]}, ${palette.starAlpha * envelope})`);
+      gradient.addColorStop(0.55, `rgba(${m.color[0]}, ${m.color[1]}, ${m.color[2]}, ${palette.meteorAlpha * 0.45 * envelope})`);
+      gradient.addColorStop(1, `rgba(${m.color[0]}, ${m.color[1]}, ${m.color[2]}, ${palette.meteorAlpha * envelope})`);
 
       ctx.strokeStyle = gradient;
-      ctx.lineWidth = 1.6;
+      ctx.lineWidth = 1.2;
       ctx.beginPath();
       ctx.moveTo(tailX, tailY);
       ctx.lineTo(headX, headY);
       ctx.stroke();
 
-      ctx.fillStyle = `rgba(${m.color[0]}, ${m.color[1]}, ${m.color[2]}, ${envelope})`;
+      ctx.fillStyle = `rgba(${m.color[0]}, ${m.color[1]}, ${m.color[2]}, ${palette.meteorAlpha * envelope})`;
       ctx.beginPath();
-      ctx.arc(headX, headY, 1.8, 0, Math.PI * 2);
+      ctx.arc(headX, headY, 1.4, 0, Math.PI * 2);
       ctx.fill();
     }
   }
