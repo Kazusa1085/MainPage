@@ -281,14 +281,6 @@ ul, ol { list-style: none; }
   .rss-card-container:nth-child(2), .rss-card-container:nth-child(3) { grid-column: auto; grid-row: auto; min-height: 160px; }
 }
 
-/* ------ Projects ------ */
-.projects-wrapper { width: 100%; max-width: 600px; margin-bottom: 40px; }
-.project-card { border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg-secondary); padding: 16px; }
-.project-card h3 { font-size: 15px; margin-bottom: 6px; color: var(--text-primary); }
-.project-card h3 a { color: var(--accent); text-decoration: none; }
-.project-card h3 a:hover { text-decoration: underline; }
-.project-card p { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
-
 /* ------ Links 链接导航（横向卡片 + 品牌悬浮色 + 鼠标光晕） ------ */
 .links-section { width: 100%; max-width: 600px; }
 .links-header { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3); padding: 0 var(--space-1); }

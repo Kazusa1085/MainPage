@@ -3,7 +3,6 @@
 
 export const site = {
   name: 'Kazusa1085',
-  tagline: '寄术博主 / 炸板小能手 / 摸鱼怪',
   url: 'https://www.raana.icu',
   ogImage: 'https://avatars.githubusercontent.com/u/195487617?v=4',
 };
@@ -86,7 +85,6 @@ export const quotes = [
 export const music = {
   enabled: false,
   volume: 0.5,
-  autoplay: false,
   playMode: 'list',
   mode: 'meting',
   meting: {
@@ -124,12 +122,6 @@ export const projects = {
   githubUser: 'https://github.com/Kazusa1085',
   count: 5,
   exclude: ['.github'],
-};
-
-export const contribution = {
-  enabled: false,
-  useRealData: true,
-  githubUser: '',
 };
 
 export const linksConfig = {

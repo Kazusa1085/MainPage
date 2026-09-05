@@ -25,22 +25,3 @@ export async function fetchRepos(githubUserUrl, count = 5, exclude = []) {
     return [];
   }
 }
-
-export async function fetchContributions(githubUserUrl) {
-  if (!githubUserUrl) return [];
-  const username = githubUserUrl.replace(/https?:\/\/github\.com\//, '').replace(/\/$/, '');
-  try {
-    const res = await fetchWithTimeout(`https://github.com/users/${username}/contributions`);
-    if (!res.ok) return [];
-    const html = await res.text();
-    const days = [];
-    const rectRegex = /<rect[^>]*data-count="(\d+)"[^>]*data-date="([^"]+)"/g;
-    let match;
-    while ((match = rectRegex.exec(html)) !== null) {
-      days.push({ date: match[2], count: parseInt(match[1], 10) });
-    }
-    return days;
-  } catch {
-    return [];
-  }
-}
