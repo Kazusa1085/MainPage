@@ -161,7 +161,7 @@ export const links = [
   {
     name: 'Email',
     description: '联系 & 合作',
-    url: 'mailto:example@email.com',
+    url: 'mailto:kazusa1085@raana.icu',
     icon: 'fa-solid fa-envelope',
     brand: 'email',
     external: false,

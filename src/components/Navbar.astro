@@ -133,7 +133,7 @@ function toggleMobileNav() {
   if (!mobileDropdown) return;
   const isActive = mobileDropdown.classList.contains('is-active');
   mobileDropdown.classList.toggle('is-active');
-  mobileDropdown.setAttribute('aria-hidden', String(!isActive));
+  mobileDropdown.setAttribute('aria-hidden', String(isActive));
   if (mobileToggle) {
     mobileToggle.setAttribute('aria-expanded', String(!isActive));
     const icon = mobileToggle.querySelector('i');

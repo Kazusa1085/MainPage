@@ -3,27 +3,12 @@ import { links, linksConfig } from '../data/config.js';
 
 const enabledLinks = links.filter((l) => l.enabled !== false);
 
-// 邮箱反爬虫处理：反转字符串 + Base64 编码，点击时再反向解码
-function encodeEmail(email) {
-  const reversed = email.split('').reverse().join('');
-  return Buffer.from(reversed).toString('base64');
-}
-
+// 邮箱使用真实 mailto 链接，保证可点击、可中键/右键打开，且不依赖内联脚本。
 function processLinkUrl(link) {
-  const antiCrawler = link.antiCrawler !== false;
-  if (antiCrawler && link.url.startsWith('mailto:')) {
-    const encoded = encodeEmail(link.url.replace('mailto:', ''));
-    return {
-      href: 'javascript:void(0)',
-      onclick: `location.href='mailto:'+atob('${encoded}').split('').reverse().join('')`,
-      isEmail: true,
-    };
-  }
   return {
     href: link.url,
     target: link.external ? '_blank' : undefined,
     rel: link.external ? 'noopener noreferrer' : undefined,
-    isEmail: false,
   };
 }
 ---
@@ -38,7 +23,7 @@ function processLinkUrl(link) {
       </div>
       <div class="links">
         {enabledLinks.map((link) => {
-          const { href, target, rel, onclick } = processLinkUrl(link);
+          const { href, target, rel } = processLinkUrl(link);
           return (
             <a
               href={href}
@@ -47,7 +32,6 @@ function processLinkUrl(link) {
               style={`--brand-color: ${link.color}`}
               target={target}
               rel={rel}
-              onclick={onclick}
               aria-label={`${link.name} - ${link.description}`}
             >
               <div class="link-left">
