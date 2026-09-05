@@ -7,7 +7,7 @@
 export const themes = {
   dark: {
     accent: '#c4a7e7',
-    bgPrimary: '#0a0a0a',
+    bgPrimary: '#000000',
     bgSecondary: '#111111',
     textPrimary: '#e0def4',
     textSecondary: '#6e6a86',

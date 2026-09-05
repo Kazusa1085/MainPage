@@ -1,29 +1,27 @@
-// Canvas-based animated background: flowing nebula + soft aurora bands.
-// Theme-aware: reads the current data-theme and uses different palettes.
+// Canvas-based animated background: deep-space nebula + a single sweeping light band.
+// Dark mode uses pure black as the base, with a focused high-impact center.
 // Reduced motion renders a static frame only.
 
 const PALETTES = {
   dark: {
-    nebula1: [108, 92, 231],
+    nebula: [120, 80, 220],
     nebula2: [196, 167, 231],
-    nebula3: [0, 255, 159],
-    aurora1: [196, 167, 231],
-    aurora2: [0, 255, 159],
-    star: [224, 222, 244],
-    nebulaAlpha: 0.1,
-    auroraAlpha: 0.08,
-    starAlpha: 0.4,
+    accent: [0, 255, 159],
+    star: [255, 255, 255],
+    nebulaAlpha: 0.14,
+    beamAlpha: 0.16,
+    starAlpha: 0.55,
+    stars: 34,
   },
   light: {
-    nebula1: [136, 192, 208],
+    nebula: [136, 192, 208],
     nebula2: [94, 129, 172],
-    nebula3: [216, 222, 233],
-    aurora1: [136, 192, 208],
-    aurora2: [94, 129, 172],
+    accent: [136, 192, 208],
     star: [76, 86, 106],
-    nebulaAlpha: 0.08,
-    auroraAlpha: 0.06,
-    starAlpha: 0.24,
+    nebulaAlpha: 0.07,
+    beamAlpha: 0.07,
+    starAlpha: 0.2,
+    stars: 22,
   },
 };
 
@@ -74,13 +72,13 @@ class BackgroundCanvas {
   }
 
   createParticles() {
-    const count = this.reduced ? 18 : 48;
+    const count = this.reduced ? 12 : this.palette.stars;
     this.particles = Array.from({ length: count }, () => ({
       x: Math.random(),
       y: Math.random(),
       z: 0.35 + Math.random() * 0.65,
-      r: 0.5 + Math.random() * 1.4,
-      speed: 0.004 + Math.random() * 0.012,
+      r: 0.4 + Math.random() * 1.1,
+      speed: 0.003 + Math.random() * 0.009,
       phase: Math.random() * Math.PI * 2,
       twinkle: 1 + Math.random() * 2,
     }));
@@ -96,6 +94,7 @@ class BackgroundCanvas {
       this.mouseY = (e.clientY / this.height) * 2 - 1;
     });
     document.addEventListener('themechange', () => {
+      this.createParticles();
       if (this.reduced) this.render();
     });
     document.addEventListener('visibilitychange', () => {
@@ -131,97 +130,102 @@ class BackgroundCanvas {
     const ctx = this.ctx;
     const { width: w, height: h } = this;
     const palette = this.palette;
+    const isDark = this.mode === 'dark';
     const reduced = this.reduced;
 
     ctx.clearRect(0, 0, w, h);
 
+    if (isDark) {
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, w, h);
+    }
+
     ctx.save();
-    // 在深色下让光带更亮，浅色下保持克制。
-    ctx.globalCompositeOperation = this.mode === 'dark' ? 'lighter' : 'source-over';
-    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = isDark ? 'lighter' : 'source-over';
 
     this.renderNebula(ctx, w, h, palette, reduced);
-    this.renderAurora(ctx, w, h, palette, reduced);
+    this.renderBeam(ctx, w, h, palette, reduced);
     this.renderStars(ctx, w, h, palette, reduced);
 
     ctx.restore();
   }
 
   renderNebula(ctx, w, h, palette, reduced) {
-    const colors = [palette.nebula1, palette.nebula2, palette.nebula3];
-    const positions = [
-      { x: 0.2, y: 0.28, r: 0.5, drift: 0.0 },
-      { x: 0.82, y: 0.22, r: 0.52, drift: 1.4 },
-      { x: 0.5, y: 0.72, r: 0.58, drift: 2.2 },
+    const cx = w * 0.5 + this.currentX * 28;
+    const cy = h * 0.42 + this.currentY * 22;
+    const maxR = Math.max(w, h);
+
+    // Layered radial gradients give the nebula a soft volumetric feel.
+    const layers = [
+      { color: palette.nebula, r: 0.48, alpha: palette.nebulaAlpha },
+      { color: palette.nebula2, r: 0.3, alpha: palette.nebulaAlpha * 1.35 },
+      { color: palette.accent, r: 0.16, alpha: palette.nebulaAlpha * 0.8 },
     ];
 
-    for (let i = 0; i < positions.length; i++) {
-      const cfg = positions[i];
-      const drift = reduced ? 0 : Math.sin(this.time * 0.04 + cfg.drift);
-      const cx = cfg.x * w + drift * w * 0.06 + this.currentX * -24;
-      const cy = cfg.y * h - drift * h * 0.04 + this.currentY * -18;
-      const radius = Math.max(1, cfg.r * Math.max(w, h));
-      const color = colors[i];
-      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
-      g.addColorStop(0, `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${palette.nebulaAlpha})`);
+    for (const layer of layers) {
+      const drift = reduced ? 0 : Math.sin(this.time * 0.05) * maxR * 0.04;
+      const gx = cx + drift;
+      const gy = cy - drift * 0.35;
+      const g = ctx.createRadialGradient(gx, gy, 0, gx, gy, layer.r * maxR);
+      g.addColorStop(0, `rgba(${layer.color[0]}, ${layer.color[1]}, ${layer.color[2]}, ${layer.alpha})`);
       g.addColorStop(1, 'rgba(0, 0, 0, 0)');
       ctx.fillStyle = g;
       ctx.fillRect(0, 0, w, h);
     }
   }
 
-  renderAurora(ctx, w, h, palette, reduced) {
-    const bands = [
-      { color: palette.aurora1, phase: 0, width: 0.32, height: 0.34 },
-      { color: palette.aurora2, phase: 2.1, width: 0.45, height: 0.18 },
-    ];
+  renderBeam(ctx, w, h, palette, reduced) {
+    const t = reduced ? 0.2 : this.time;
+    const accent = palette.accent;
 
-    for (const band of bands) {
-      const middleY = h * (band.height + Math.sin(this.time * 0.08 + band.phase) * 0.035 + this.currentY * 0.026);
-      const c1y = middleY - h * 0.22 + Math.sin(this.time * 0.12 + band.phase) * h * 0.05;
-      const c2y = middleY + h * 0.18 + Math.cos(this.time * 0.1 + band.phase) * h * 0.055;
-      const startX = -w * 0.25;
-      const endX = w * 1.25;
+    // One wide, diagonal light band across the screen.
+    const baseY = h * 0.52 + Math.sin(t * 0.12) * h * 0.08 + this.currentY * 26;
+    const c1y = baseY - h * 0.32 + Math.sin(t * 0.18) * h * 0.09;
+    const c2y = baseY + h * 0.28 + Math.cos(t * 0.14) * h * 0.1;
+    const startX = -w * 0.3 + Math.sin(t * 0.1) * w * 0.06;
+    const endX = w * 1.3 + Math.cos(t * 0.08) * w * 0.05;
 
-      ctx.beginPath();
-      ctx.moveTo(startX, middleY + Math.sin(this.time * 0.07 + band.phase) * h * 0.02);
-      ctx.bezierCurveTo(
-        w * 0.25 + Math.cos(this.time * 0.07 + band.phase) * w * 0.08,
-        c1y,
-        w * 0.75 + Math.sin(this.time * 0.09 + band.phase) * w * 0.08,
-        c2y,
-        endX,
-        middleY + Math.cos(this.time * 0.1 + band.phase) * h * 0.02,
-      );
+    const gradient = ctx.createLinearGradient(startX, baseY, endX, baseY);
+    gradient.addColorStop(0, `rgba(${accent[0]}, ${accent[1]}, ${accent[2]}, 0)`);
+    gradient.addColorStop(0.45, `rgba(${accent[0]}, ${accent[1]}, ${accent[2]}, ${palette.beamAlpha})`);
+    gradient.addColorStop(0.55, `rgba(${accent[0]}, ${accent[1]}, ${accent[2]}, ${palette.beamAlpha})`);
+    gradient.addColorStop(1, `rgba(${accent[0]}, ${accent[1]}, ${accent[2]}, 0)`);
 
-      const baseAlpha = palette.auroraAlpha;
-      ctx.strokeStyle = `rgba(${band.color[0]}, ${band.color[1]}, ${band.color[2]}, ${baseAlpha})`;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.lineWidth = Math.max(30, band.width * w);
-      ctx.globalAlpha = 0.6;
-      ctx.stroke();
-      ctx.lineWidth = Math.max(14, band.width * w * 0.55);
-      ctx.globalAlpha = 0.75;
-      ctx.stroke();
-      ctx.lineWidth = Math.max(5, band.width * w * 0.22);
-      ctx.globalAlpha = 1;
-      ctx.stroke();
-      ctx.globalAlpha = 1;
-    }
+    ctx.beginPath();
+    ctx.moveTo(startX, baseY + Math.sin(t * 0.11) * h * 0.03);
+    ctx.bezierCurveTo(
+      w * 0.25 + Math.sin(t * 0.13) * w * 0.1,
+      c1y,
+      w * 0.75 + Math.cos(t * 0.1) * w * 0.1,
+      c2y,
+      endX,
+      baseY + Math.cos(t * 0.13) * h * 0.03,
+    );
+
+    ctx.strokeStyle = gradient;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = Math.max(80, w * 0.22);
+    ctx.globalAlpha = 0.75;
+    ctx.stroke();
+    ctx.lineWidth = Math.max(34, w * 0.09);
+    ctx.globalAlpha = 1;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
   }
 
   renderStars(ctx, w, h, palette, reduced) {
     if (reduced) return;
+    // Sparse, high-contrast stars with depth parallax.
     for (const p of this.particles) {
       p.y -= p.speed;
       if (p.y < -0.05) p.y = 1.05;
 
-      const px = p.x * w + this.currentX * 22 * p.z;
-      const py = p.y * h + this.currentY * 18 * p.z;
-      const size = p.r * (0.5 + p.z * 0.8);
-      const alpha = palette.starAlpha * (0.45 + 0.55 * Math.sin(this.time * p.twinkle + p.phase));
-      ctx.globalAlpha = Math.max(0.05, alpha);
+      const px = p.x * w + this.currentX * 34 * p.z;
+      const py = p.y * h + this.currentY * 28 * p.z;
+      const size = p.r * (0.4 + p.z * 1.1);
+      const alpha = palette.starAlpha * (0.3 + 0.7 * Math.abs(Math.sin(this.time * p.twinkle + p.phase)));
+      ctx.globalAlpha = Math.max(0.04, alpha);
       ctx.fillStyle = `rgba(${palette.star[0]}, ${palette.star[1]}, ${palette.star[2]}, 1)`;
       ctx.beginPath();
       ctx.arc(px, py, size, 0, Math.PI * 2);
