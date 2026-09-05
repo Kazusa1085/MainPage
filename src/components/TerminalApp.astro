@@ -1,5 +1,5 @@
 ---
-import { identity, interests, gear, quotes, site, profile, nav, links as linksData, rss as rssConfig, projects as projectsConfig, theme } from '../data/config.js';
+import { identity, interests, gear, quotes, site, profile, links as linksData, rss as rssConfig, projects as projectsConfig, theme } from '../data/config.js';
 import { fetchArticles } from '../data/fetch-rss.js';
 import { fetchRepos } from '../data/fetch-github.js';
 
@@ -8,40 +8,35 @@ const repos = projectsConfig.enabled ? await fetchRepos(projectsConfig.githubUse
 const defaultMode = theme.default === 'light' ? 'light' : 'dark';
 ---
 
-<div class="terminal-app">
-  <div class="terminal-titlebar">
-    <div class="traffic-lights" aria-hidden="true">
-      <span class="close"></span>
-      <span class="minimize"></span>
-      <span class="maximize"></span>
+<div class="terminal-backdrop">
+  <div class="terminal-window">
+    <div class="terminal-titlebar">
+      <div class="traffic-lights" aria-hidden="true">
+        <span class="close"></span>
+        <span class="minimize"></span>
+        <span class="maximize"></span>
+      </div>
+      <span class="terminal-title">kazusa@127.0.0.1</span>
     </div>
-    <span class="terminal-title">kazusa@raana:~</span>
-    <button class="terminal-theme-toggle" id="terminal-theme-toggle" aria-label="切换深浅色模式" title="切换深浅色模式">
-      <i class="fa-solid fa-moon" aria-hidden="true"></i>
-    </button>
-  </div>
 
-  <div class="terminal-screen" id="terminal-screen" tabindex="0" aria-label="终端输出">
-    <div class="terminal-output" id="terminal-output"></div>
-  </div>
-
-  <form class="terminal-input-form" id="terminal-form">
-    <label class="terminal-prompt" for="terminal-input" aria-hidden="true">$</label>
-    <input
-      id="terminal-input"
-      class="terminal-input"
-      type="text"
-      autocomplete="off"
-      autocapitalize="off"
-      spellcheck="false"
-      aria-label="终端命令输入"
-      placeholder="Type 'help' to get started"
-    />
-  </form>
-
-  <div class="terminal-statusbar">
-    <span>raana.icu</span>
-    <span id="terminal-clock"></span>
+    <div class="terminal-body" id="terminal-body">
+      <div class="terminal-output" id="terminal-output"></div>
+      <form class="terminal-prompt-form" id="terminal-form">
+        <label class="terminal-prompt-text" for="terminal-input">
+          <span class="prompt-user">visitor@127.0.0.1</span><span class="prompt-path">:~$</span>
+        </label>
+        <input
+          id="terminal-input"
+          class="terminal-input"
+          type="text"
+          autocomplete="off"
+          autocapitalize="off"
+          spellcheck="false"
+          aria-label="终端命令输入"
+          placeholder="welcome"
+        />
+      </form>
+    </div>
   </div>
 </div>
 
@@ -50,15 +45,10 @@ import { initTheme, getTheme } from '../scripts/theme.js';
 
 initTheme(defaultMode);
 
-const screen = document.getElementById('terminal-screen');
+const body = document.getElementById('terminal-body');
 const output = document.getElementById('terminal-output');
 const input = document.getElementById('terminal-input');
 const form = document.getElementById('terminal-form');
-const clock = document.getElementById('terminal-clock');
-const themeToggle = document.getElementById('terminal-theme-toggle');
-const themeIcon = themeToggle?.querySelector('i');
-
-let ghostPrompt = false;
 
 function print(text, cls = '') {
   const line = document.createElement('div');
@@ -69,7 +59,7 @@ function print(text, cls = '') {
     line.textContent = text;
   }
   output.appendChild(line);
-  screen.scrollTop = screen.scrollHeight;
+  body.scrollTop = body.scrollHeight;
 }
 
 function printList(items) {
@@ -78,17 +68,32 @@ function printList(items) {
 
 function clearScreen() {
   output.innerHTML = '';
+  printWelcome();
 }
 
-function updateThemeIcon() {
-  const mode = getTheme()?.getMode() || document.documentElement.getAttribute('data-theme') || 'dark';
-  if (themeIcon) themeIcon.className = mode === 'dark' ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
-  if (themeToggle) themeToggle.setAttribute('aria-label', mode === 'dark' ? '切换为浅色模式' : '切换为深色模式');
-}
+function printWelcome() {
+  const logo = document.createElement('div');
+  logo.className = 'terminal-hero';
+  logo.innerHTML = `
+    <h1 class="ascii-logo">${site.name}</h1>
+    <pre class="ascii-skull" aria-hidden="true">
+     .---.
+    /     \\
+   |  o o  |
+   |   ^   |
+    \\ '-' /
+   __|___|__
+  /__/   \\__\\</pre>
+  `;
+  output.appendChild(logo);
 
-function toggleTheme() {
-  getTheme()?.toggle();
-  updateThemeIcon();
+  print("Welcome to " + site.name + "'s terminal bio. (Version 1.0.0)");
+  print('----', 'muted');
+  print("This project's source code can be found in this project's GitHub repo.");
+  print('----', 'muted');
+  print('For a list of available commands, type "help".');
+  print('');
+  body.scrollTop = body.scrollHeight;
 }
 
 function execute(raw) {
@@ -99,6 +104,7 @@ function execute(raw) {
     case 'help':
       print('Available commands:', 'muted');
       print('  help              show this help');
+      print('  welcome           show the welcome screen');
       print('  whoami            about me');
       print('  cat interests     my interests');
       print('  cat gear          my gear');
@@ -109,6 +115,9 @@ function execute(raw) {
       print('  neofetch          system info');
       print('  theme             toggle dark/light');
       print('  clear             clear terminal');
+      break;
+    case 'welcome':
+      printWelcome();
       break;
     case 'whoami':
       print(identity.join(' / '));
@@ -161,31 +170,17 @@ function execute(raw) {
       print('        ▀▀▀▀▀▀▀▀▀▀▀▀▀        ' + (profile.tagline.highlight || ''));
       break;
     case 'theme':
-      toggleTheme();
+      getTheme()?.toggle();
       print('Theme toggled.');
       break;
     case 'clear':
-      clearScreen();
+      output.innerHTML = '';
+      printWelcome();
       break;
     default:
       print(`command not found: ${cmd}`);
-      print("Type 'help' to see available commands.");
+      print('Type "help" to see available commands.');
   }
-}
-
-function updateClock() {
-  if (clock) clock.textContent = new Date().toLocaleTimeString('zh-CN', { hour12: false });
-}
-
-function boot() {
-  updateClock();
-  setInterval(updateClock, 1000);
-  print('Last login: ' + new Date().toLocaleString('zh-CN'), 'muted');
-  print('');
-  print('Welcome to ' + site.name + "'s terminal.");
-  print("Type 'help' to see available commands.");
-  print('');
-  screen.focus();
 }
 
 form.addEventListener('submit', (e) => {
@@ -195,6 +190,7 @@ form.addEventListener('submit', (e) => {
   print('$ ' + raw, 'cmd');
   execute(raw);
   input.value = '';
+  body.scrollTop = body.scrollHeight;
 });
 
 document.addEventListener('keydown', (e) => {
@@ -210,13 +206,6 @@ window.addEventListener('click', () => {
   input.focus();
 });
 
-screen.addEventListener('click', () => input.focus());
-
-themeToggle?.addEventListener('click', (e) => {
-  e.stopPropagation();
-  toggleTheme();
-});
-
-updateThemeIcon();
-boot();
+printWelcome();
+input.focus();
 </script>

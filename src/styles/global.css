@@ -399,66 +399,93 @@ body, .container, .rss-section, .links-section, .profile, .footer, .notice, .nav
 }
 .navbar-brand .brand-name { min-width: 7em; display: inline-block; }
 
-/* ------ Full Terminal App ------ */
-.terminal-app {
+/* ------ Terminal Bio Window ------ */
+.terminal-backdrop {
   position: relative;
   z-index: 10;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+.terminal-window {
+  width: min(1000px, 100%);
+  min-height: 70vh;
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  height: 100dvh;
-  width: 100%;
-  background: rgba(2, 5, 10, 0.78);
-  color: var(--text-primary);
+  background: #131b23;
+  border-radius: 12px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  color: #e6edf3;
   font-family: var(--font-mono);
   font-size: 0.875rem;
 }
-html[data-theme='light'] .terminal-app {
-  background: rgba(250, 251, 253, 0.86);
+html[data-theme='light'] .terminal-window {
+  background: #f4f6f8;
+  color: #2e3440;
+  box-shadow: 0 30px 80px rgba(76, 86, 106, 0.15);
 }
 .terminal-titlebar {
   display: flex;
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-2) var(--space-4);
-  border-bottom: 1px solid var(--border);
+  background: #0c1218;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+html[data-theme='light'] .terminal-titlebar {
+  background: #e7ebf0;
+  border-bottom: 1px solid rgba(76, 86, 106, 0.12);
 }
 .terminal-title {
   flex: 1;
   text-align: center;
   font-size: 0.75rem;
   color: var(--text-secondary);
-  opacity: 0.75;
+  opacity: 0.8;
   letter-spacing: 0.06em;
 }
-.terminal-theme-toggle {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: color var(--duration-snappy) ease, background var(--duration-snappy) ease, border-color var(--duration-snappy) ease;
-}
-.terminal-theme-toggle:hover {
-  color: var(--accent);
-  background: var(--hover-bg);
-  border-color: var(--border);
-}
-.terminal-screen {
+.terminal-body {
   flex: 1;
   overflow-y: auto;
-  padding: clamp(16px, 4vw, 40px) clamp(14px, 4vw, 48px) 32px;
-  outline: none;
+  padding: 28px 34px 24px;
 }
 .terminal-output {
-  max-width: 900px;
-  margin: 0 auto;
   line-height: 1.65;
+}
+.terminal-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+.ascii-logo {
+  font-family: "Arial Black", "Avenir Next", "Helvetica Neue", sans-serif;
+  font-size: clamp(2rem, 7vw, 4.2rem);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 2px #d7dce2;
+  text-stroke: 2px #d7dce2;
+  text-shadow: 0 0 14px rgba(215, 220, 226, 0.18);
+}
+html[data-theme='light'] .ascii-logo {
+  -webkit-text-stroke: 2px #4c566a;
+  text-stroke: 2px #4c566a;
+  text-shadow: 0 0 14px rgba(76, 86, 106, 0.1);
+}
+.ascii-skull {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  line-height: 1.12;
+  color: var(--text-secondary);
+  opacity: 0.85;
+  white-space: pre;
 }
 .terminal-line {
   white-space: pre-wrap;
@@ -471,20 +498,30 @@ html[data-theme='light'] .terminal-app {
 .terminal-line.muted {
   color: var(--text-secondary);
 }
-.terminal-input-form {
+.terminal-prompt-form {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-3) clamp(14px, 4vw, 48px);
-  border-top: 1px solid var(--border);
-  background: rgba(0, 0, 0, 0.22);
+  padding-top: var(--space-4);
 }
-html[data-theme='light'] .terminal-input-form {
-  background: rgba(255, 255, 255, 0.18);
-}
-.terminal-prompt {
-  color: var(--accent);
+.terminal-prompt-text {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  white-space: nowrap;
   font-family: var(--font-mono);
+}
+.prompt-user {
+  color: #4ade80;
+}
+.prompt-path {
+  color: #60a5fa;
+}
+html[data-theme='light'] .prompt-user {
+  color: #0f766e;
+}
+html[data-theme='light'] .prompt-path {
+  color: #2563eb;
 }
 .terminal-input {
   flex: 1;
@@ -498,18 +535,24 @@ html[data-theme='light'] .terminal-input-form {
 }
 .terminal-input::placeholder {
   color: var(--text-secondary);
-  opacity: 0.55;
+  opacity: 0.45;
 }
-.terminal-statusbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-2) clamp(14px, 4vw, 48px);
-  border-top: 1px solid var(--border);
-  font-size: 0.68rem;
-  color: var(--text-secondary);
-  opacity: 0.8;
-  font-family: var(--font-mono);
+
+@media (max-width: 700px) {
+  .terminal-backdrop {
+    padding: 16px 10px;
+  }
+  .terminal-body {
+    padding: 20px 18px 18px;
+  }
+  .terminal-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .ascii-skull {
+    font-size: 0.5rem;
+  }
 }
 
 /* ------ Terminal Dashboard Layout ------ */
