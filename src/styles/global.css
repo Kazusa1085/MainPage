@@ -411,7 +411,8 @@ body, .container, .rss-section, .links-section, .profile, .footer, .notice, .nav
 }
 .terminal-window {
   width: min(1000px, 100%);
-  min-height: 70vh;
+  height: min(72vh, 760px);
+  min-height: 0;
   display: flex;
   flex-direction: column;
   background: #131b23;
@@ -538,6 +539,9 @@ html[data-theme='light'] .prompt-path {
 @media (max-width: 700px) {
   .terminal-backdrop {
     padding: 16px 10px;
+  }
+  .terminal-window {
+    height: 82vh;
   }
   .terminal-body {
     padding: 20px 18px 18px;
