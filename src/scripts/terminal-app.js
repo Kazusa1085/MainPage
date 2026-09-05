@@ -26,20 +26,30 @@ export function initTerminalApp(data) {
   }
 
   function printWelcome() {
-    const logo = document.createElement('div');
-    logo.className = 'terminal-hero';
-    logo.innerHTML = `
-      <h1 class="ascii-logo">${site.name}</h1>
-      <pre class="ascii-skull" aria-hidden="true">
-     .---.
-    /     \\
-   |  o o  |
-   |   ^   |
-    \\ '-' /
-   __|___|__
-  /__/   \\__\\</pre>
+    const neofetch = document.createElement('div');
+    neofetch.className = 'neofetch';
+    const themeMode = getTheme()?.getMode() || defaultMode;
+    neofetch.innerHTML = `
+      <pre class="neofetch-logo" aria-hidden="true">
+ ██╗  ██╗
+ ██║ ██╔╝
+ █████╔╝
+ ██╔═██╗
+ ██║  ██╗
+ ╚═╝  ╚═╝
+      </pre>
+      <div class="neofetch-info">
+        <div class="nf-user">visitor@raana.icu</div>
+        <div class="nf-divider">-----------------</div>
+        <div>OS: Astro ${defaultMode}</div>
+        <div>Host: raana.icu</div>
+        <div>Kernel: astro</div>
+        <div>Uptime: ∞</div>
+        <div>Shell: zsh</div>
+        <div>Theme: ${themeMode}</div>
+      </div>
     `;
-    output.appendChild(logo);
+    output.appendChild(neofetch);
 
     print("Welcome to " + site.name + "'s terminal bio. (Version 1.0.0)");
     print('----', 'muted');
