@@ -44,9 +44,9 @@ class BackgroundCanvas {
     this.raf = null;
     this.reduced = prefersReducedMotion();
 
+    this.resize();
+    this.createParticles();
     if (this.reduced) {
-      this.resize();
-      this.createParticles();
       this.render();
     }
   }
@@ -137,7 +137,8 @@ class BackgroundCanvas {
     const vanishX = w / 2 + this.currentX * 36;
 
     // Soft horizon glow.
-    const glow = ctx.createRadialGradient(vanishX, horizon, 0, vanishX, horizon, Math.max(w, h) * 0.65);
+    const glowRadius = Math.max(1, Math.max(w, h) * 0.65);
+    const glow = ctx.createRadialGradient(vanishX, horizon, 0, vanishX, horizon, glowRadius);
     const glowColor = mode === 'light' ? palette.glow : palette.glow;
     const glowAlpha = reduced ? 0.05 : mode === 'light' ? 0.06 : 0.09;
     glow.addColorStop(0, `rgba(${glowColor[0]}, ${glowColor[1]}, ${glowColor[2]}, ${glowAlpha})`);
