@@ -57,32 +57,15 @@ ul, ol { list-style: none; }
   .cursor.hover { transform: none; }
 }
 
-/* ------ 背景网格（全端显示；外层负责 2D 视差，内层负责背景流动） ------ */
-.grid-bg {
+/* ------ Canvas 动画背景 ------ */
+.background-canvas {
   position: fixed;
-  top: -50%;
-  left: -50%;
-  width: 200vw;
-  height: 200%;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
   z-index: 0;
   pointer-events: none;
-  will-change: transform;
 }
-.grid-bg-inner {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(var(--grid-color) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-  background-size: 50px 50px;
-  animation: gridMove 8s linear infinite;
-  will-change: transform;
-}
-@keyframes gridMove {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(50px); }
-}
-@media (prefers-reduced-motion: reduce) { .grid-bg-inner { animation: none; } }
 
 /* ------ Container ------ */
 .container { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 40px 20px; padding-top: calc(var(--navbar-height) + 40px); padding-bottom: 88px; width: 100%; max-width: 100%; }

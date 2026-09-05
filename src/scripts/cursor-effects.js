@@ -1,5 +1,7 @@
-// 全局鼠标动效：自定义跟随光标 + 背景网格（全端显示，桌面端额外叠加鼠标视差）
-// 移植自 MoeHome 原项目的 CustomCursor / GridParallax
+// 全局鼠标动效：自定义跟随光标 + Canvas 动画背景
+// 背景由 background.js 负责，这里只处理光标动效。
+
+import { initBackground } from './background.js';
 
 const prefersReducedMotion = () =>
   window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -65,79 +67,17 @@ class CustomCursor {
   }
 }
 
-// 背景网格：始终创建（全端可见）。
-// 外层 .grid-bg 负责 2D 鼠标视差，内层 .grid-bg-inner 负责 CSS 网格流动。
-// 不叠加 3D perspective/rotateX，避免 1px 网格线在透视压缩后产生摩尔纹/闪烁。
-function initGridBackground() {
-  if (document.querySelector('.grid-bg')) return null;
-  const gridBg = document.createElement('div');
-  gridBg.className = 'grid-bg';
-  const gridBgInner = document.createElement('div');
-  gridBgInner.className = 'grid-bg-inner';
-  gridBg.appendChild(gridBgInner);
-  document.body.insertBefore(gridBg, document.body.firstChild);
-  return gridBg;
-}
-
-/**
- * GridParallax - 桌面端鼠标视差（仅叠加 2D 平移，不接管持续流动）
- * 关键点：外层 .grid-bg 只做 2D 视差 transform，内层 .grid-bg-inner 独立做流动 transform，
- * 两侧属性不互相覆盖；外层已放大到 200%，平移不会露边。
- */
-class GridParallax {
-  constructor(gridBg) {
-    this.gridBg = gridBg;
-    this.mouseX = 0;
-    this.mouseY = 0;
-    this.currentX = 0;
-    this.currentY = 0;
-    this.animationId = null;
-  }
-
-  init() {
-    if (!this.gridBg) return;
-    this.bindEvents();
-    this.animate();
-  }
-
-  bindEvents() {
-    document.addEventListener('mousemove', (e) => {
-      this.mouseX = (e.clientX - window.innerWidth / 2) * 0.02;
-      this.mouseY = (e.clientY - window.innerHeight / 2) * 0.02;
-    });
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) this.stopAnimation();
-      else this.animate();
-    });
-  }
-
-  animate() {
-    this.currentX += (this.mouseX - this.currentX) * 0.06;
-    this.currentY += (this.mouseY - this.currentY) * 0.06;
-    this.gridBg.style.transform =
-      `translate3d(${this.currentX}px, ${this.currentY}px, 0)`;
-    this.animationId = requestAnimationFrame(() => this.animate());
-  }
-
-  stopAnimation() {
-    if (this.animationId) { cancelAnimationFrame(this.animationId); this.animationId = null; }
-  }
-}
-
 export function initCursorEffects() {
   const reduced = prefersReducedMotion();
   const finePointer = hasFinePointer();
 
-  // 网格背景：始终创建（全端可见）。偏好减少动画时，CSS 的 reduced-motion 规则会自动停掉流动动画，
-  // 保留静态网格作为背景，不需要在 JS 这里额外判断。
-  const gridBg = initGridBackground();
+  // Canvas 背景：始终初始化，模块内部会处理 reduced-motion 和隐藏暂停。
+  initBackground();
 
-  if (reduced) return; // 无障碍：偏好减少动画的用户，跳过下面两个纯装饰性动效
+  if (reduced) return; // 无障碍：偏好减少动画的用户，跳过纯装饰性光标动效
 
   // 跟随光标：只在有精确指针(鼠标)的设备上启用，触屏设备没有意义
   if (finePointer) {
     new CustomCursor().init();
-    // 鼠标视差：同样只在桌面端(有鼠标)叠加，移动端网格仅保留基础流动动画
-    new GridParallax(gridBg).init();
   }
 }
