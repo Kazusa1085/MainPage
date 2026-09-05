@@ -51,7 +51,7 @@ export function initTerminalApp(data) {
     `;
     output.appendChild(neofetch);
 
-    print("Welcome to " + site.name + "'s terminal bio. (Version 1.0.0)");
+    print("Welcome to " + site.name + "'s Mainpage terminal.");
     print('----', 'muted');
     print("This project's source code can be found in this project's GitHub repo.");
     print('----', 'muted');
