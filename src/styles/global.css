@@ -399,4 +399,173 @@ body, .container, .rss-section, .links-section, .profile, .footer, .notice, .nav
 }
 .navbar-brand .brand-name { min-width: 7em; display: inline-block; }
 
+/* ------ Terminal Dashboard Layout ------ */
+.terminal-dashboard {
+  position: relative;
+  width: min(1080px, calc(100% - 32px));
+  margin: clamp(24px, 6vh, 80px) auto;
+  color: var(--text-primary);
+  background: rgba(10, 10, 10, 0.6);
+  border: 1px solid rgba(196, 167, 231, 0.18);
+  border-radius: 16px;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow:
+    0 28px 90px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+html[data-theme='light'] .terminal-dashboard {
+  background: rgba(255, 255, 255, 0.62);
+  border-color: rgba(76, 86, 106, 0.18);
+  box-shadow:
+    0 28px 90px rgba(76, 86, 106, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono);
+}
+.dashboard-title {
+  flex: 1;
+  text-align: center;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  opacity: 0.75;
+  letter-spacing: 0.5px;
+}
+.dashboard-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.dashboard-theme-toggle {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  background: transparent;
+  cursor: pointer;
+  transition: color var(--duration-snappy) ease, background var(--duration-snappy) ease, border-color var(--duration-snappy) ease;
+}
+.dashboard-theme-toggle:hover {
+  color: var(--accent);
+  background: var(--hover-bg);
+  border-color: var(--border);
+}
+
+.dashboard-body {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: 72vh;
+}
+.dashboard-sidebar {
+  padding: var(--space-6) var(--space-4);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  font-family: var(--font-mono);
+}
+.sidebar-heading {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-secondary);
+  opacity: 0.6;
+}
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.sidebar-nav a {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.8125rem;
+  transition: color var(--duration-snappy) ease, background var(--duration-snappy) ease;
+}
+.sidebar-nav a:hover,
+.sidebar-nav a:focus-visible {
+  color: var(--accent);
+  background: var(--hover-bg);
+}
+.sidebar-nav .prompt {
+  color: var(--accent);
+}
+.sidebar-status {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  opacity: 0.8;
+}
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  animation: statusPulse 2s ease-in-out infinite;
+}
+.dashboard-content {
+  padding: clamp(28px, 5vw, 64px) clamp(20px, 5vw, 72px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+.dashboard-section {
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+}
+
+@media (max-width: 760px) {
+  .terminal-dashboard {
+    width: calc(100% - 20px);
+    margin: 16px auto;
+  }
+  .dashboard-body {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+  .dashboard-sidebar {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+  }
+  .sidebar-heading,
+  .sidebar-status {
+    display: none;
+  }
+  .sidebar-nav {
+    flex-direction: row;
+  }
+  .sidebar-nav a {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+}
+
 

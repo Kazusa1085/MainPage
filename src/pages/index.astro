@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Navbar from '../components/Navbar.astro';
 import Profile from '../components/Profile.astro';
 import MusicPlayer from '../components/MusicPlayer.astro';
 import Terminal from '../components/Terminal.astro';
@@ -12,54 +11,84 @@ import Footer from '../components/Footer.astro';
 ---
 
 <BaseLayout>
-  <Navbar />
+  <div class="terminal-dashboard" id="terminal-dashboard">
+    <header class="dashboard-header">
+      <div class="traffic-lights" aria-hidden="true">
+        <span class="close"></span>
+        <span class="minimize"></span>
+        <span class="maximize"></span>
+      </div>
+      <div class="dashboard-title" aria-hidden="true">kazusa@raana:~</div>
+      <div class="dashboard-actions">
+        <button id="dashboard-theme-toggle" class="dashboard-theme-toggle" aria-label="切换深浅色模式" title="切换深浅色模式">
+          <i class="fa-solid fa-moon" aria-hidden="true"></i>
+        </button>
+      </div>
+    </header>
 
-  <main class="container">
-    <!-- Skeleton Screen -->
-    <div class="profile skeleton-container" id="skeleton-screen" role="status" aria-label="Loading content" aria-live="polite">
-      <span class="sr-only">正在加载页面内容，请稍候...</span>
-      <div class="skeleton-avatar skeleton"></div>
-      <div class="skeleton-name skeleton"></div>
-      <div class="skeleton-tagline skeleton"></div>
-      <div class="skeleton-music skeleton"></div>
-      <div class="skeleton-terminal skeleton"></div>
-      <div class="skeleton-divider skeleton"></div>
-      <div class="skeleton-footer skeleton"></div>
-    </div>
+    <div class="dashboard-body">
+      <aside class="dashboard-sidebar" aria-label="站点导航">
+        <div class="sidebar-heading">nav</div>
+        <nav class="sidebar-nav">
+          <a href="#profile-section"><span class="prompt">$</span><span>whoami</span></a>
+          <a href="#terminal"><span class="prompt">$</span><span>terminal</span></a>
+          <a href="#rss-section"><span class="prompt">$</span><span>posts</span></a>
+          <a href="#projects-section"><span class="prompt">$</span><span>projects</span></a>
+          <a href="#links-container"><span class="prompt">$</span><span>links</span></a>
+        </nav>
+        <div class="sidebar-status">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span>online</span>
+        </div>
+      </aside>
 
-    <!-- Actual Content -->
-    <div class="profile content-initial-hidden" id="actual-content" aria-busy="true">
-      <Profile />
-      <MusicPlayer />
-      <Terminal />
-      <RSS />
-      <Projects />
-      <Links />
-      <Notice />
-      <Footer />
+      <main class="dashboard-content" id="actual-content" aria-busy="true">
+        <section class="dashboard-section" id="profile-section">
+          <Profile />
+        </section>
+        <Terminal />
+        <RSS />
+        <Projects />
+        <Links />
+        <Notice />
+        <Footer />
+      </main>
     </div>
-  </main>
+  </div>
 </BaseLayout>
 
 <script>
+import { initTheme, getTheme } from '../scripts/theme.js';
 import { animation } from '../data/config.js';
 
-// Skeleton screen: show content after a delay
-const skeleton = document.getElementById('skeleton-screen');
-const content = document.getElementById('actual-content');
+const defaultMode = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+initTheme(defaultMode);
 
-// Fade in content after skeleton delay
-const fadeInDelay = animation.fadeInDelay;
-setTimeout(() => {
-  if (skeleton) skeleton.style.opacity = '0';
-  if (content) {
-    content.classList.remove('content-initial-hidden');
-    content.classList.add('content-visible');
-    content.setAttribute('aria-busy', 'false');
-  }
-  // Remove skeleton from DOM after transition
-  setTimeout(() => skeleton?.remove(), 300);
-}, fadeInDelay);
+// Theme toggle in dashboard window chrome
+const themeToggle = document.getElementById('dashboard-theme-toggle');
+const themeIcon = themeToggle?.querySelector('i');
+
+function updateToggleIcon() {
+  const mgr = getTheme();
+  const mode = mgr ? mgr.getMode() : (document.documentElement.getAttribute('data-theme') || 'dark');
+  if (themeIcon) themeIcon.className = mode === 'dark' ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+  if (themeToggle) themeToggle.setAttribute('aria-label', mode === 'dark' ? '切换为浅色模式' : '切换为深色模式');
+}
+updateToggleIcon();
+themeToggle?.addEventListener('click', () => {
+  getTheme()?.toggle();
+  updateToggleIcon();
+});
+document.addEventListener('themechange', updateToggleIcon);
+
+// Fade in the dashboard after a short delay
+const content = document.getElementById('actual-content');
+if (content) {
+  setTimeout(() => {
+    content.classList.add('dashboard-visible');
+    content.removeAttribute('aria-busy');
+  }, animation.fadeInDelay);
+}
 
 // ===== 滚动渐显 (lazy-load)：Terminal / RSS / Links 等区块滚入视口时淡入 =====
 const lazyElements = document.querySelectorAll('.lazy-load');
@@ -84,8 +113,13 @@ if (lazyElements.length > 0) {
 </script>
 
 <style>
-  .skeleton-music { width: 100%; height: 34px; margin: 24px 0 40px; border-radius: 4px; }
-  .skeleton { background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--border) 50%, var(--bg-secondary) 75%); background-size: 200% 100%; animation: skeleton-loading 1.5s ease-in-out infinite; }
-  .skeleton-container { transition: opacity 0.3s ease; }
-  #actual-content { position: relative; z-index: 5; }
+  .dashboard-content {
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .dashboard-content.dashboard-visible {
+    opacity: 1;
+    transform: none;
+  }
 </style>
