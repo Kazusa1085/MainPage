@@ -66,8 +66,8 @@ class CustomCursor {
 }
 
 // 背景网格：始终创建（全端可见）。
-// 外层 .grid-bg 负责 3D 变换/鼠标视差，内层 .grid-bg-inner 负责 CSS 网格流动。
-// 流动通过 transform 驱动而不是 background-position，避免在透视层上重绘背景导致闪烁。
+// 外层 .grid-bg 负责 2D 鼠标视差，内层 .grid-bg-inner 负责 CSS 网格流动。
+// 不叠加 3D perspective/rotateX，避免 1px 网格线在透视压缩后产生摩尔纹/闪烁。
 function initGridBackground() {
   if (document.querySelector('.grid-bg')) return null;
   const gridBg = document.createElement('div');
@@ -80,9 +80,9 @@ function initGridBackground() {
 }
 
 /**
- * GridParallax - 桌面端鼠标视差（仅叠加轻微倾斜跟随，不接管持续流动）
- * 关键点：外层 .grid-bg 只做视差 transform，内层 .grid-bg-inner 独立做流动 transform，
- * 两侧属性不互相覆盖。
+ * GridParallax - 桌面端鼠标视差（仅叠加 2D 平移，不接管持续流动）
+ * 关键点：外层 .grid-bg 只做 2D 视差 transform，内层 .grid-bg-inner 独立做流动 transform，
+ * 两侧属性不互相覆盖；外层已放大到 200%，平移不会露边。
  */
 class GridParallax {
   constructor(gridBg) {
@@ -115,7 +115,7 @@ class GridParallax {
     this.currentX += (this.mouseX - this.currentX) * 0.06;
     this.currentY += (this.mouseY - this.currentY) * 0.06;
     this.gridBg.style.transform =
-      `perspective(500px) rotateX(60deg) translateY(${this.currentY}px) translateX(${this.currentX}px)`;
+      `translate3d(${this.currentX}px, ${this.currentY}px, 0)`;
     this.animationId = requestAnimationFrame(() => this.animate());
   }
 
