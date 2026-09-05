@@ -66,8 +66,8 @@ class CustomCursor {
 }
 
 // 背景网格：始终创建（全端可见）。
-// 外层 .grid-bg 负责 3D 变换/鼠标视差，内层 .grid-bg-inner 负责 CSS 背景流动。
-// 把 transform 和 background-position 动画分到不同 DOM 层，避免同一个元素上两套运动互相干扰。
+// 外层 .grid-bg 负责 3D 变换/鼠标视差，内层 .grid-bg-inner 负责 CSS 网格流动。
+// 流动通过 transform 驱动而不是 background-position，避免在透视层上重绘背景导致闪烁。
 function initGridBackground() {
   if (document.querySelector('.grid-bg')) return null;
   const gridBg = document.createElement('div');
@@ -81,8 +81,8 @@ function initGridBackground() {
 
 /**
  * GridParallax - 桌面端鼠标视差（仅叠加轻微倾斜跟随，不接管持续流动）
- * 关键点：transform 只作用在外层 .grid-bg，background-position 动画只作用在内层 .grid-bg-inner，
- * 两侧互不直接覆盖同一个元素的属性。
+ * 关键点：外层 .grid-bg 只做视差 transform，内层 .grid-bg-inner 独立做流动 transform，
+ * 两侧属性不互相覆盖。
  */
 class GridParallax {
   constructor(gridBg) {
