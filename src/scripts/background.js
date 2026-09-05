@@ -44,6 +44,8 @@ class BackgroundCanvas {
     this.time = 0;
     this.lastTime = 0;
     this.particles = [];
+    this.meteors = [];
+    this.nextMeteor = 0;
     this.raf = null;
     this.reduced = prefersReducedMotion();
 
@@ -123,8 +125,72 @@ class BackgroundCanvas {
     this.time += dt;
     this.currentX += (this.mouseX - this.currentX) * 0.045;
     this.currentY += (this.mouseY - this.currentY) * 0.045;
+    this.updateMeteors();
     this.render();
     this.raf = requestAnimationFrame((next) => this.loop(next));
+  }
+
+  updateMeteors() {
+    for (const m of this.meteors) {
+      m.life += 1 / 60;
+      m.progress = Math.min(1, m.life / m.duration);
+    }
+    this.meteors = this.meteors.filter((m) => m.progress < 1);
+
+    if (this.time >= this.nextMeteor) {
+      this.spawnMeteor();
+      this.nextMeteor = this.time + 2.5 + Math.random() * 5;
+    }
+  }
+
+  spawnMeteor() {
+    const w = this.width;
+    const h = this.height;
+    const accent = this.palette.accent;
+    const startX = w * (0.15 + Math.random() * 0.7);
+    const startY = h * (0.05 + Math.random() * 0.4);
+    const direction = Math.random() < 0.5 ? -1 : 1;
+    const dx = direction * (w * (0.08 + Math.random() * 0.08));
+    const dy = h * (0.08 + Math.random() * 0.1);
+    this.meteors.push({
+      x: startX,
+      y: startY,
+      dx,
+      dy,
+      duration: 0.7 + Math.random() * 0.7,
+      life: 0,
+      progress: 0,
+      trail: 0.12 + Math.random() * 0.08,
+      color: accent,
+    });
+  }
+
+  renderMeteors(ctx, w, h, palette, reduced) {
+    if (reduced) return;
+    for (const m of this.meteors) {
+      const t = m.progress;
+      const headX = m.x + m.dx * t;
+      const headY = m.y + m.dy * t;
+      const tailX = headX - m.dx * m.trail;
+      const tailY = headY - m.dy * m.trail;
+      const envelope = Math.sin(t * Math.PI);
+
+      const gradient = ctx.createLinearGradient(tailX, tailY, headX, headY);
+      gradient.addColorStop(0, `rgba(${m.color[0]}, ${m.color[1]}, ${m.color[2]}, 0)`);
+      gradient.addColorStop(1, `rgba(${m.color[0]}, ${m.color[1]}, ${m.color[2]}, ${palette.starAlpha * envelope})`);
+
+      ctx.strokeStyle = gradient;
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(tailX, tailY);
+      ctx.lineTo(headX, headY);
+      ctx.stroke();
+
+      ctx.fillStyle = `rgba(${m.color[0]}, ${m.color[1]}, ${m.color[2]}, ${envelope})`;
+      ctx.beginPath();
+      ctx.arc(headX, headY, 1.8, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
 
   render() {
@@ -145,7 +211,7 @@ class BackgroundCanvas {
     ctx.globalCompositeOperation = isDark ? 'lighter' : 'source-over';
 
     this.renderNebula(ctx, w, h, palette, reduced);
-    this.renderSweep(ctx, w, h, palette, reduced);
+    this.renderMeteors(ctx, w, h, palette, reduced);
     this.renderStars(ctx, w, h, palette, reduced);
 
     ctx.restore();
@@ -173,51 +239,6 @@ class BackgroundCanvas {
       ctx.fillStyle = g;
       ctx.fillRect(0, 0, w, h);
     }
-  }
-
-  renderSweep(ctx, w, h, palette, reduced) {
-    if (reduced) return;
-
-    // A slow sweep happens only once per cycle, with a fade in/out envelope.
-    const cycle = 11;
-    const phase = (this.time % cycle) / cycle;
-    if (phase > 0.42) return;
-
-    const local = phase / 0.42;
-    const envelope = Math.sin(local * Math.PI);
-    const accent = palette.accent;
-
-    const sweepX = -w * 0.35 + local * (w * 1.7);
-    const y = h * (0.25 + Math.sin(this.time * 0.2) * 0.08) + this.currentY * 18;
-    const c1y = y - h * 0.18;
-    const c2y = y + h * 0.18;
-
-    const gradient = ctx.createLinearGradient(sweepX, y, sweepX + w * 0.7, y);
-    gradient.addColorStop(0, `rgba(${accent[0]}, ${accent[1]}, ${accent[2]}, 0)`);
-    gradient.addColorStop(0.5, `rgba(${accent[0]}, ${accent[1]}, ${accent[2]}, ${palette.beamAlpha * envelope})`);
-    gradient.addColorStop(1, `rgba(${accent[0]}, ${accent[1]}, ${accent[2]}, 0)`);
-
-    ctx.beginPath();
-    ctx.moveTo(sweepX, y);
-    ctx.bezierCurveTo(
-      sweepX + w * 0.18,
-      c1y,
-      sweepX + w * 0.5,
-      c2y,
-      sweepX + w * 0.82,
-      y,
-    );
-
-    ctx.strokeStyle = gradient;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.lineWidth = Math.max(36, w * 0.1);
-    ctx.globalAlpha = 0.8;
-    ctx.stroke();
-    ctx.lineWidth = Math.max(12, w * 0.035);
-    ctx.globalAlpha = 1;
-    ctx.stroke();
-    ctx.globalAlpha = 1;
   }
 
   renderStars(ctx, w, h, palette, reduced) {
